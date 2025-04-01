@@ -1,0 +1,37 @@
+clear p ac_data
+close all
+
+addpath('tools/');
+
+p = parselog('C:\MavLab\ESC_Feedback_Log\Flight_Data\25_01_17__15_36_58_SD.data');
+ac_data = p.aircrafts.data;
+
+%% Data Slicing 
+
+ac_sdata = data_slicer(ac_data);
+
+%% Old Data Loading (temporary may not work with new curve fitter with more variables)
+
+ l_file = load("FL_144_Omega_R_P.mat");
+ ac_sdata = l_file.data;
+
+%% Basic Curve Fitting 
+
+input_data = [ones(size(ac_sdata.airspeed)) ac_sdata.power ac_sdata.rpm ac_sdata.rpmrate];
+coefs = input_data \ ac_sdata.airspeed;
+
+norm_data = ac_sdata.airspeed - (input_data*coefs);
+std_c =sqrt(sum(norm_data.^2)/(length(ac_sdata.airspeed)-3));
+
+
+figure;
+plot(ac_sdata.timestamp, ac_sdata.airspeed,".r")
+hold on
+grid on
+plot(ac_sdata.timestamp, input_data*coefs, ".b")
+xlabel("Time (s)")
+ylabel("Airspeed (m/s)")
+
+
+%% Robust Linear Fitting
+

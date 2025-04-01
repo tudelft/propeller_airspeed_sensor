@@ -1,11 +1,12 @@
 function data = data_slicer(ac_data)
     
-    
+    %Interpolating Block
     radio_control = interp1(ac_data.ROTORCRAFT_RADIO_CONTROL.timestamp,double(ac_data.ROTORCRAFT_RADIO_CONTROL.mode),ac_data.SERIAL_ACT_T4_IN.timestamp);
     airspeed_data = double(interp1(ac_data.AIR_DATA.timestamp,double(ac_data.AIR_DATA.airspeed),ac_data.SERIAL_ACT_T4_IN.timestamp));
     airspeed_data(isnan(airspeed_data),1) = 0;
     rpm_data = double(ac_data.SERIAL_ACT_T4_IN.motor_1_rpm);
     power_data = double(ac_data.SERIAL_ACT_T4_IN.motor_1_voltage_int.*ac_data.SERIAL_ACT_T4_IN.motor_1_current_int)./10000;
+    dshot_data = double(ac_data.SERIAL_ACT_T4_OUT.motor_1_dshot_cmd);
     timestamp = ac_data.SERIAL_ACT_T4_IN.timestamp;
 
     %Filtering Block
@@ -24,7 +25,6 @@ function data = data_slicer(ac_data)
     airspeedfilt_data = filtfilt(d,airspeed_data);
     
     
-    
     %RPM Rate Block
     rpmrate_data = zeros(length(rpm_data),1);
     
@@ -35,9 +35,10 @@ function data = data_slicer(ac_data)
     %Cutting Block
     %gps_data = interp1(ac_data.GPS_INT.timestamp,double(ac_data.GPS_INT.airspeed),ac_data.SERIAL_ACT_T4_IN.timestamp);
     index = (find(radio_control>-1 & airspeedfilt_data>5 & rpmfilt_data>1000)-1);
-    
+   
     data.airspeed = airspeedfilt_data(index);
     data.rpm = rpmfilt_data(index);
     data.power = powerfilt_data(index);
     data.rpmrate = rpmrate_data(index);
     data.timestamp = timestamp(index);
+    data.dshot = dshot_data(index);
