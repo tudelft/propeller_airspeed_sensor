@@ -12,12 +12,12 @@ ac_sdata = data_slicer(ac_data);
 
 %% Old Data Loading (temporary may not work with new curve fitter with more variables)
 
- l_file = load("FL_254_Omega_R_P.mat");
+ l_file = load("FL_144_Omega_R_P.mat");
  ac_sdata = l_file.data;
 
 %% Basic Curve Fitting 
 
-input_data = [ones(size(ac_sdata.airspeed)) ac_sdata.power (ac_sdata.power).^2 ac_sdata.rpm (ac_sdata.rpm).^2 ac_sdata.rpmrate ];
+input_data = [ones(size(ac_sdata.airspeed)) ac_sdata.power (ac_sdata.power).^2 (ac_sdata.power).^3 ac_sdata.rpm (ac_sdata.rpm).^2 ac_sdata.rpmrate ];
 coefs = input_data \ ac_sdata.airspeed;
 
 norm_data = ac_sdata.airspeed - (input_data*coefs);
@@ -33,18 +33,4 @@ xlabel("Time (s)")
 ylabel("Airspeed (m/s)")
 
 %% Vaidating the fits 
-l_file = load("FL_418_Omega_R_P.mat");
-ac_sdata = l_file.data;
 
-test_data = [ones(size(ac_sdata.airspeed)) ac_sdata.power (ac_sdata.power).^2  ac_sdata.rpm (ac_sdata.rpm).^2 ac_sdata.rpmrate ];
-test_ndata = ac_sdata.airspeed - (test_data*coefs);
-std_c =sqrt(sum(test_ndata.^2 )/(length(ac_sdata.airspeed)-3));
-
-
-figure;
-plot(ac_sdata.timestamp, ac_sdata.airspeed,".r")
-hold on
-grid on
-plot(ac_sdata.timestamp, test_data*coefs, ".b")
-xlabel("Time (s)")
-ylabel("Airspeed (m/s)")
