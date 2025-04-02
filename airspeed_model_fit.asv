@@ -1,0 +1,55 @@
+% clear; close all;
+
+%% 
+% load('reduced_flight_logs/144.mat');
+
+tranges = [250 350; 370 400];
+
+%%
+fs = 500;
+
+datarange = [];
+for i = 1:size(tranges,1)
+    trange = tranges(i,:);
+
+    datarange_start = find(ac_data.SERIAL_ACT_T4_IN.timestamp > trange(1), 1, 'first') - 1;
+    datarange_end = find(ac_data.SERIAL_ACT_T4_IN.timestamp > trange(2), 1, 'first') - 1;
+        
+    datarange = [datarange datarange_start:datarange_end];
+end
+
+%%
+t = ac_data.SERIAL_ACT_T4_IN.timestamp;
+airspeed = interp1(ac_data.AIR_DATA.timestamp, ac_data.AIR_DATA.airspeed, t, "linear", "extrap");
+rpm = double([ac_data.SERIAL_ACT_T4_IN.motor_1_rpm, ac_data.SERIAL_ACT_T4_IN.motor_2_rpm]);
+current = double([ac_data.SERIAL_ACT_T4_IN.motor_1_current_int/100, ac_data.SERIAL_ACT_T4_IN.motor_2_current_int/100]);
+voltage = double([ac_data.SERIAL_ACT_T4_IN.motor_1_voltage_int/100, ac_data.SERIAL_ACT_T4_IN.motor_2_voltage_int/100]);
+power = voltage.*current;
+
+%% filter with Butterworth
+filter_freq = 5;
+[b, a] = butter(2,filter_freq/(fs/2));
+
+airspeed_filt = filtfilt(b,a,airspeed);
+rpm_filt = filtfilt(b,a,rpm);
+current_filt = filtfilt(b,a,current);
+voltage_filt = filtfilt(b,a,voltage);
+
+%% derivatives
+rpm_filtd = [zeros(1,2); diff(rpm_filt,1)]*fs;
+
+%%
+input = [power(datarange,1) rpm(datarange,1) rpm_filtd(datarange,1)];
+output = airspeed(datarange);
+
+model = input \ output;
+
+%%
+figure;
+plot(t(datarange), output;
+plot(t(datarange), output);
+hold on
+grid on
+plot(ac_sdata.timestamp, input_data*coefs, ".b")
+xlabel("Time (s)")
+ylabel("Airspeed (m/s)")
