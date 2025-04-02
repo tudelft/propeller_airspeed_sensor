@@ -17,7 +17,9 @@ v = 10; % Velocity you want to cut at
 ac_sdata = data_slicer(ac_data,v);
 %% Basic Curve Fitting 
 
-input_data = [ones(size(ac_sdata.airspeed)) ac_sdata.power (ac_sdata.power).^2 ac_sdata.rpm (ac_sdata.rpm).^2 ac_sdata.rpmrate ];
+input_data = [ones(size(ac_sdata.airspeed)) ac_sdata.power (ac_sdata.power).^2 ...
+    ac_sdata.rpm (ac_sdata.rpm).^2 ac_sdata.rpmrate ...
+    ac_sdata.dshot ac_sdata.dshotrate];
 coefs = input_data \ ac_sdata.airspeed;
 
 model = fitlm(input_data,ac_sdata.airspeed,"linear",'Intercept', false);
@@ -43,7 +45,7 @@ ac_s_tdata = data_slicer(ac_tdata,v);
 
 %%
 test_data = [ones(size(ac_s_tdata.airspeed)) ac_s_tdata.power (ac_s_tdata.power).^2 ...
-    ac_s_tdata.rpm (ac_s_tdata.rpm).^2 ac_s_tdata.rpmrate ];
+    ac_s_tdata.rpm (ac_s_tdata.rpm).^2 ac_s_tdata.rpmrate ac_s_tdata.dshot ];
 test_ndata = ac_s_tdata.airspeed - (test_data*coefs);
 std_t =sqrt(sum(test_ndata.^2 )/(length(ac_s_tdata.airspeed)-3));
 

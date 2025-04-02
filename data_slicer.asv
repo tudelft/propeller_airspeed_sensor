@@ -23,7 +23,7 @@ function data = data_slicer(ac_data,v_a_select)
     rpmfilt_data= filtfilt(d,rpm_data);
     powerfilt_data = filtfilt(d,power_data);
     airspeedfilt_data = filtfilt(d,airspeed_data);
-    dshotfilt_data = filtfilt(d,dshot_data);
+    dshotfilt_data = filtfilt(d,d)
     
     
     %RPM Rate Block
@@ -32,7 +32,7 @@ function data = data_slicer(ac_data,v_a_select)
     
     for i = 1:length(rpm_data)-1
         rpmrate_data(i+1) = (rpmfilt_data(i+1)-rpmfilt_data(i))/ dt; %Order one numerical deferentiation (improve later)
-        dshotrate_data(i+1) = (dshotfilt_data(i+1) - dshotfilt_data(i)) /dt;
+        dshotrate_data(i+1) = dshot_data
     end
     
     %Cutting Block
@@ -45,4 +45,3 @@ function data = data_slicer(ac_data,v_a_select)
     data.rpmrate = rpmrate_data(index);
     data.timestamp = timestamp(index);
     data.dshot = dshot_data(index);
-    data.dshotrate = dshotrate_data(index);
