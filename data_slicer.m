@@ -1,4 +1,4 @@
-function data = data_slicer(ac_data)
+function data = data_slicer(ac_data,v_a_select)
     
     %Interpolating Block
     radio_control = interp1(ac_data.ROTORCRAFT_RADIO_CONTROL.timestamp,double(ac_data.ROTORCRAFT_RADIO_CONTROL.mode),ac_data.SERIAL_ACT_T4_IN.timestamp);
@@ -12,7 +12,7 @@ function data = data_slicer(ac_data)
     %Filtering Block
     fs = 500 ; 
     dt = 1/fs;
-    d = designfilt("lowpassiir",'PassbandFrequency',50, ...     % Frequency constraints
+    d = designfilt("lowpassiir",'PassbandFrequency',5, ...     % Frequency constraints
        'StopbandFrequency',100, ...
        'PassbandRipple',4, ...          % Magnitude constraints
        'StopbandAttenuation',55, ...
@@ -34,7 +34,7 @@ function data = data_slicer(ac_data)
     
     %Cutting Block
     %gps_data = interp1(ac_data.GPS_INT.timestamp,double(ac_data.GPS_INT.airspeed),ac_data.SERIAL_ACT_T4_IN.timestamp);
-    index = (find(radio_control>-1 & airspeedfilt_data>5 & rpmfilt_data>1000)-1);
+    index = (find(radio_control>-1 & airspeedfilt_data>v_a_select & rpmfilt_data>1000)-1);
    
     data.airspeed = airspeedfilt_data(index);
     data.rpm = rpmfilt_data(index);
