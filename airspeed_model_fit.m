@@ -24,6 +24,10 @@ end
 
 %%
 t = ac_data.SERIAL_ACT_T4_IN.timestamp;
+
+gyro = [ac_data.IMU_GYRO_SCALED.gp_alt ac_data.IMU_GYRO_SCALED.gq_alt ac_data.IMU_GYRO_SCALED.gr_alt]/180*pi;
+gyro = interp1(ac_data.IMU_GYRO_SCALED.timestamp, gyro, t, "linear", "extrap");
+
 airspeed = interp1(ac_data.AIR_DATA.timestamp, ac_data.AIR_DATA.airspeed, t, "linear", "extrap");
 rpm = double([ac_data.SERIAL_ACT_T4_IN.motor_1_rpm, ac_data.SERIAL_ACT_T4_IN.motor_2_rpm]);
 current = double([ac_data.SERIAL_ACT_T4_IN.motor_1_current_int, ac_data.SERIAL_ACT_T4_IN.motor_2_current_int])/100;
@@ -41,6 +45,7 @@ current_filt = filtfilt(b,a,current);
 voltage_filt = filtfilt(b,a,voltage);
 power_filt = filtfilt(b,a,power);
 dshot_filt = filtfilt(b,a,dshot);
+gyro_filt = filtfilt(b,a,gyro);
 
 %% derivatives
 rpm_filtd = [zeros(1,2); diff(rpm_filt,1)]*fs;
@@ -49,7 +54,7 @@ dshot_filtd = [zeros(1,2); diff(dshot_filt,1)]*fs;
 %% fitting
 input = [power_filt(datarange,1) rpm_filt(datarange,1) , ...
          power_filt(datarange,1).^2 rpm_filt(datarange,1).^2 , ...
-         rpm_filtd(datarange,1) dshot_filtd(datarange,1)];
+         rpm_filtd(datarange,1)];
 output = airspeed_filt(datarange);
 
 % mdl = input \ output;
