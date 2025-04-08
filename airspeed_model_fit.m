@@ -7,7 +7,10 @@
 % 144
 % tranges = [253 333];
 % 145
-tranges = [470 596];
+% tranges = [470 596];
+
+% 0061 mat
+tranges = [128 232; 344 446; 518 620; 692 794; 875 950];
 
 %%
 fs = 500;
@@ -25,8 +28,8 @@ end
 %%
 t = ac_data.SERIAL_ACT_T4_IN.timestamp;
 
-gyro = [ac_data.IMU_GYRO_SCALED.gp_alt ac_data.IMU_GYRO_SCALED.gq_alt ac_data.IMU_GYRO_SCALED.gr_alt]/180*pi;
-gyro = interp1(ac_data.IMU_GYRO_SCALED.timestamp, gyro, t, "linear", "extrap");
+% gyro = [ac_data.IMU_GYRO_SCALED.gp_alt ac_data.IMU_GYRO_SCALED.gq_alt ac_data.IMU_GYRO_SCALED.gr_alt]/180*pi;
+% gyro = interp1(ac_data.IMU_GYRO_SCALED.timestamp, gyro, t, "linear", "extrap");
 
 airspeed = interp1(ac_data.AIR_DATA.timestamp, ac_data.AIR_DATA.airspeed, t, "linear", "extrap");
 rpm = double([ac_data.SERIAL_ACT_T4_IN.motor_1_rpm, ac_data.SERIAL_ACT_T4_IN.motor_2_rpm]);
@@ -45,7 +48,7 @@ current_filt = filtfilt(b,a,current);
 voltage_filt = filtfilt(b,a,voltage);
 power_filt = filtfilt(b,a,power);
 dshot_filt = filtfilt(b,a,dshot);
-gyro_filt = filtfilt(b,a,gyro);
+% gyro_filt = filtfilt(b,a,gyro);
 
 %% derivatives
 rpm_filtd = [zeros(1,2); diff(rpm_filt,1)]*fs;
@@ -58,7 +61,7 @@ input = [power_filt(datarange,1) rpm_filt(datarange,1) , ...
 output = airspeed_filt(datarange);
 
 % mdl = input \ output;
-mdl = fitlm(input, output, "linear", 'Intercept', true);
+mdl = fitlm(input, output, "linear", 'Intercept', false);
 
 %% plotting
 fprintf('R^2: %.2f\n', mdl.Rsquared.Ordinary);
@@ -79,7 +82,7 @@ hold off;
 
 ax2 = nexttile;
 hold on; grid on; zoom on;
-plot(t(datarange), rpm_filt(datarange,1), DisplayName="rpm", LineWidth=1.5);
+plot(t(datarange), rpm_filt(datarange,1), '.', DisplayName="rpm", LineWidth=1.5);
 xlabel('t[sec]');
 ylabel('[rpm]');
 title('rpm');
@@ -88,7 +91,7 @@ hold off;
 
 ax3 = nexttile;
 hold on; grid on; zoom on;
-plot(t(datarange), power_filt(datarange,1), DisplayName="power", LineWidth=1.5);
+plot(t(datarange), power_filt(datarange,1), '.', DisplayName="power", LineWidth=1.5);
 xlabel('t[sec]');
 ylabel('[Watt]');
 title('power');
@@ -97,7 +100,7 @@ hold off;
 
 ax4 = nexttile;
 hold on; grid on; zoom on;
-plot(t(datarange), rpm_filtd(datarange,1), DisplayName="rpm dot", LineWidth=1.5);
+plot(t(datarange), rpm_filtd(datarange,1), '.', DisplayName="rpm dot", LineWidth=1.5);
 xlabel('t[sec]');
 ylabel('[Watt]');
 title('rpm dot');
