@@ -55,12 +55,12 @@ power_filt = filtfilt(b,a,power);
 dshot_filt = filtfilt(b,a,dshot);
 % gyro_filt = filtfilt(b,a,gyro);
 
-%%
-datarange = airspeed>=9 & power(:,1)>=30 & angle<1 & rpm_filtd(:,1)<1000 & rpm_filtd(:,1)>-1000 & rpm(:,1)<10000;
-
 %% derivatives
 rpm_filtd = [zeros(1,2); diff(rpm_filt,1)]*fs;
 dshot_filtd = [zeros(1,2); diff(dshot_filt,1)]*fs;
+
+%%
+datarange = airspeed>=9 & power(:,1)>=30 & angle<1 & rpm_filtd(:,1)<1000 & rpm_filtd(:,1)>-1000 & rpm(:,1)<10000;
 
 %% fitting
 input = [power_filt(datarange,1) rpm_filt(datarange,1) , ...
