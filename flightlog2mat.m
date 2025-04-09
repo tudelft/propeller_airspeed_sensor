@@ -110,4 +110,4 @@ plot(data.AIR_DATA.timestamp, data.AIR_DATA.angle);
 
 %% save as "ac_data" for consistency
 ac_data = data;
-save(fullfile("reduced_flight_logs", log_nbr), 'ac_data');
+save(fullfile("post_data", log_nbr), 'ac_data');
