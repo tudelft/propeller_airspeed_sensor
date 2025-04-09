@@ -75,7 +75,7 @@ end
 %% make the new struct
 data = struct();
 
-% % SERIAL_ACT_T4_IN
+% SERIAL_ACT_T4_IN
 data.SERIAL_ACT_T4_IN.timestamp = ac_data.SERIAL_ACT_T4_IN.timestamp;
 data.SERIAL_ACT_T4_IN.motor_1_rpm = ac_data.SERIAL_ACT_T4_IN.motor_1_rpm; 
 data.SERIAL_ACT_T4_IN.motor_2_rpm = ac_data.SERIAL_ACT_T4_IN.motor_2_rpm; 
@@ -109,5 +109,5 @@ plot(data.SERIAL_ACT_T4_IN.timestamp, data.SERIAL_ACT_T4_IN.motor_1_rpm/100);
 plot(data.AIR_DATA.timestamp, data.AIR_DATA.angle);
 
 %% save as "ac_data" for consistency
-ac_data = data;
-save(fullfile("post_data", log_nbr), 'ac_data');
+% ac_data = data;
+% save(fullfile("post_data", log_nbr), 'ac_data');
