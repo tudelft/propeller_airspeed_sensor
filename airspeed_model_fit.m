@@ -10,7 +10,11 @@
 % tranges = [470 596];
 
 % 0061 mat
-tranges = [128 232; 344 446; 518 620; 692 794; 875 950];
+% tranges = [128 232; 344 446; 518 620; 692 794; 875 950];
+% tranges = [160 250];
+
+% whole (0061 and 0062)
+tranges = [1 2590];
 
 %%
 fs = 500;
@@ -32,6 +36,7 @@ t = ac_data.SERIAL_ACT_T4_IN.timestamp;
 % gyro = interp1(ac_data.IMU_GYRO_SCALED.timestamp, gyro, t, "linear", "extrap");
 
 airspeed = interp1(ac_data.AIR_DATA.timestamp, ac_data.AIR_DATA.airspeed, t, "linear", "extrap");
+angle = interp1(ac_data.AIR_DATA.timestamp, ac_data.AIR_DATA.angle, t, "linear", "extrap");
 rpm = double([ac_data.SERIAL_ACT_T4_IN.motor_1_rpm, ac_data.SERIAL_ACT_T4_IN.motor_2_rpm]);
 current = double([ac_data.SERIAL_ACT_T4_IN.motor_1_current_int, ac_data.SERIAL_ACT_T4_IN.motor_2_current_int])/100;
 voltage = double([ac_data.SERIAL_ACT_T4_IN.motor_1_voltage_int, ac_data.SERIAL_ACT_T4_IN.motor_2_voltage_int])/100;
@@ -50,6 +55,9 @@ power_filt = filtfilt(b,a,power);
 dshot_filt = filtfilt(b,a,dshot);
 % gyro_filt = filtfilt(b,a,gyro);
 
+%%
+datarange = airspeed>=9 & power(:,1)>=30 & angle<1 & rpm_filtd(:,1)<1000 & rpm_filtd(:,1)>-1000 & rpm(:,1)<10000;
+
 %% derivatives
 rpm_filtd = [zeros(1,2); diff(rpm_filt,1)]*fs;
 dshot_filtd = [zeros(1,2); diff(dshot_filt,1)]*fs;
@@ -61,7 +69,7 @@ input = [power_filt(datarange,1) rpm_filt(datarange,1) , ...
 output = airspeed_filt(datarange);
 
 % mdl = input \ output;
-mdl = fitlm(input, output, "linear", 'Intercept', false);
+mdl = fitlm(input, output, "linear", 'Intercept', true);
 
 %% plotting
 fprintf('R^2: %.2f\n', mdl.Rsquared.Ordinary);
