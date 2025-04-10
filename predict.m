@@ -1,20 +1,11 @@
-% clear; 
-% close all;
+% load dataset to be tested first
+
+%% load estimated model
+load('models/WT.mat');
 
 %% 
-% load('reduced_flight_logs/144.mat');
-
 % 144
-% tranges = [253 333];
-% 145
-% tranges = [470 596];
-
-% 0061 mat
-% tranges = [128 232; 344 446; 518 620; 692 794; 875 950];
-% tranges = [160 250];
-
-% whole (0061 and 0062)
-tranges = [1 2590];
+tranges = [253 333];
 
 %%
 fs = 500;
@@ -25,7 +16,7 @@ for i = 1:size(tranges,1)
 
     datarange_start = find(ac_data.SERIAL_ACT_T4_IN.timestamp > trange(1), 1, 'first') - 1;
     datarange_end = find(ac_data.SERIAL_ACT_T4_IN.timestamp > trange(2), 1, 'first') - 1;
-        
+
     datarange = [datarange datarange_start:datarange_end];
 end
 
@@ -36,7 +27,7 @@ t = ac_data.SERIAL_ACT_T4_IN.timestamp;
 % gyro = interp1(ac_data.IMU_GYRO_SCALED.timestamp, gyro, t, "linear", "extrap");
 
 airspeed = interp1(ac_data.AIR_DATA.timestamp, ac_data.AIR_DATA.airspeed, t, "linear", "extrap");
-angle = interp1(ac_data.AIR_DATA.timestamp, ac_data.AIR_DATA.angle, t, "linear", "extrap");
+% angle = interp1(ac_data.AIR_DATA.timestamp, ac_data.AIR_DATA.angle, t, "linear", "extrap");
 rpm = double([ac_data.SERIAL_ACT_T4_IN.motor_1_rpm, ac_data.SERIAL_ACT_T4_IN.motor_2_rpm]);
 current = double([ac_data.SERIAL_ACT_T4_IN.motor_1_current_int, ac_data.SERIAL_ACT_T4_IN.motor_2_current_int])/100;
 voltage = double([ac_data.SERIAL_ACT_T4_IN.motor_1_voltage_int, ac_data.SERIAL_ACT_T4_IN.motor_2_voltage_int])/100;
@@ -60,64 +51,22 @@ rpm_filtd = [zeros(1,2); diff(rpm_filt,1)]*fs;
 dshot_filtd = [zeros(1,2); diff(dshot_filt,1)]*fs;
 
 %%
-datarange2 = airspeed>=9 & power(:,1)>=30 & angle<1 & rpm_filtd(:,1)<1000 & rpm_filtd(:,1)>-1000 & rpm(:,1)<10000;
-% datarange2 = airspeed>=9 & power(:,1)>=30 & rpm_filtd(:,1)<1000 & rpm_filtd(:,1)>-1000 & rpm(:,1)<10000;
+% datarange2 = airspeed>=9 & power(:,1)>=30 & angle<1 & rpm_filtd(:,1)<1000 & rpm_filtd(:,1)>-1000 & rpm(:,1)<10000;
+datarange2 = airspeed>=9 & power(:,1)>=30 & rpm_filtd(:,1)<1000 & rpm_filtd(:,1)>-1000 & rpm(:,1)<10000;
 
 datarange = datarange & datarange2;
 
-%% fitting
+%%
 input = [power_filt(datarange,1) rpm_filt(datarange,1) , ...
          power_filt(datarange,1).^2 rpm_filt(datarange,1).^2];
-output = airspeed_filt(datarange);
 
-% mdl = input \ output;
-mdl = fitlm(input, output, "linear", 'Intercept', true);
+airspeed_pred = predict(mdl, input);
 
-%% plotting
-fprintf('R^2: %.2f\n', mdl.Rsquared.Ordinary);
-fprintf('Coeff: '); fprintf('%.8f ', mdl.Coefficients.Estimate); fprintf("\n");
-
-figure('Name','Airspeed model fit');
-tiledlayout(3, 2, 'Padding', 'compact', 'TileSpacing', 'compact');
-
-ax1 = nexttile([3, 1]);
 hold on; grid on; zoom on;
-plot(t(datarange), output, '.', MarkerEdgeColor='b', DisplayName="Real data");
-plot(t(datarange), mdl.Fitted, '.', MarkerEdgeColor='r', DisplayName="Interpolated data");
+plot(t(datarange), airspeed(datarange), '.', MarkerEdgeColor='b', DisplayName="Real data");
+plot(t(datarange), airspeed_pred, '.', MarkerEdgeColor='r', DisplayName="Interpolated data");
 xlabel('t[sec]');
 ylabel('[m/s]');
 title('Airspeed');
 legend('show');
 hold off;
-
-ax2 = nexttile;
-hold on; grid on; zoom on;
-plot(t(datarange), rpm_filt(datarange,1), '.', DisplayName="rpm", LineWidth=1.5);
-xlabel('t[sec]');
-ylabel('[rpm]');
-title('rpm');
-legend('show');
-hold off;
-
-ax3 = nexttile;
-hold on; grid on; zoom on;
-plot(t(datarange), power_filt(datarange,1), '.', DisplayName="power", LineWidth=1.5);
-xlabel('t[sec]');
-ylabel('[Watt]');
-title('power');
-legend('show');
-hold off;
-
-ax4 = nexttile;
-hold on; grid on; zoom on;
-plot(t(datarange), rpm_filtd(datarange,1), '.', DisplayName="rpm dot", LineWidth=1.5);
-xlabel('t[sec]');
-ylabel('[Watt]');
-title('rpm dot');
-legend('show');
-hold off;
-
-linkaxes([ax1,ax2,ax3,ax4],'x');
-
-%%
-% save('models/WT.mat', 'mdl');
