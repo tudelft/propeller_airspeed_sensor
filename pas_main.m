@@ -1,3 +1,10 @@
+%% Variable List  %%
+% ac_data: 
+% ac_datalist: Struct of data sets 
+% ac_sdata: flight data that has been selected and cut to the required size
+% mdl: Current model fitted to the data
+% mdl_list: list of models currently under anlysis
+
 clear p ac_data
 close all
 
@@ -7,14 +14,9 @@ p = parselog('C:\MavLab\ESC_Feedback_Log\Flight_Data\24_10_30__16_45_37_SD.data'
 ac_data = p.aircrafts.data;
 
 
-%% Old Data Loading (temporary may not work with new curve fitter with more variables)
-
- l_file = load("FL_254_Omega_R_P.mat");
- ac_sdata = l_file.data;
-
 %% Data Slicing 
 v = 10; % Velocity you want to cut at 
-ac_sdata = data_slicer(ac_data,v);
+ac_sdata = data_selector(ac_data,v);
 %% Basic Curve Fitting 
 
 input_data = [ones(size(ac_sdata.airspeed)) ac_sdata.power (ac_sdata.power).^2 ...
@@ -41,7 +43,7 @@ ylabel("Airspeed (m/s)")
 p = parselog("C:\MavLab\ESC_Feedback_Log\Flight_Data\24_10_30__17_27_57_SD.data");
 ac_tdata = p.aircrafts.data;
 
-ac_s_tdata = data_slicer(ac_tdata,v);
+ac_s_tdata = data_selector(ac_tdata,v);
 
 %%
 test_data = [ones(size(ac_s_tdata.airspeed)) ac_s_tdata.power (ac_s_tdata.power).^2 ...
@@ -57,3 +59,32 @@ grid on
 plot(ac_s_tdata.timestamp, test_data*coefs, ".b")
 xlabel("Time (s)")
 ylabel("Airspeed (m/s)")
+
+%% Data loading and selection
+clear
+sel = ["145","148"]; %Put the number code of the flight log you wish to use for analysis.
+ac_datalist = data_loader(sel); %When using on your own computer change the path
+
+
+%% Data Processing (Cuttting and Combining as needed)
+v = 10;
+ac_s_datalist = data_selector(ac_datalist,v);
+
+ 
+
+
+%% Model Fitting 
+%Variable Entries:
+%How many data sets are used for training
+%Order of RPM,Power,RPM rate
+rpm_order = 2;
+power_order = 3;
+rpmrate_order = 2;
+
+[mdl,test_data] = linear_model_fitter(ac_s_datalist,1,rpm_order,power_order,rpmrate_order);
+
+%% Model Testing 
+
+model_predict(mdl,test_data,rpm_order,power_order,rpmrate_order)
+
+
