@@ -20,7 +20,7 @@ function [mdl,test_data] = linear_model_fitter (ac_s_datalist,set_num,rpm_order,
     
     output = ac_data.airspeed;
     mdl = fitlm(input, output, "linear", 'Intercept', true);
-    test_data = ac_s_datalist.ac_data145;
+    test_data = ac_s_datalist.(fields{j+1});
 
     fprintf('R^2: %.2f\n', mdl.Rsquared.Ordinary);
     fprintf('Coeff: '); fprintf('%.8f ', mdl.Coefficients.Estimate); fprintf("\n");
@@ -33,7 +33,7 @@ function [mdl,test_data] = linear_model_fitter (ac_s_datalist,set_num,rpm_order,
     plot(ac_data.timestamp, output, '.', MarkerEdgeColor='b', DisplayName="Real data");
     plot(ac_data.timestamp, mdl.Fitted, '.', MarkerEdgeColor='r', DisplayName="Interpolated data");
     xlabel('t[sec]');
-    ylabel('[m/s]');
+    ylabel('V[m/s]');
     title('Airspeed');
     legend('show');
     hold off;
@@ -42,8 +42,8 @@ function [mdl,test_data] = linear_model_fitter (ac_s_datalist,set_num,rpm_order,
     hold on; grid on; zoom on;
     plot(ac_data.timestamp, ac_data.rpm, '.', DisplayName="rpm", LineWidth=1.5);
     xlabel('t[sec]');
-    ylabel('[rpm]');
-    title('rpm');
+    ylabel('RPM');
+    title('RPM');
     legend('show');
     hold off;
     
@@ -51,8 +51,8 @@ function [mdl,test_data] = linear_model_fitter (ac_s_datalist,set_num,rpm_order,
     hold on; grid on; zoom on;
     plot(ac_data.timestamp, ac_data.power, '.', DisplayName="power", LineWidth=1.5);
     xlabel('t[sec]');
-    ylabel('[Watt]');
-    title('power');
+    ylabel('Power[Watt]');
+    title('Power');
     legend('show');
     hold off;
     
@@ -60,8 +60,8 @@ function [mdl,test_data] = linear_model_fitter (ac_s_datalist,set_num,rpm_order,
     hold on; grid on; zoom on;
     plot(ac_data.timestamp, ac_data.rpmrate, '.', DisplayName="rpm dot", LineWidth=1.5);
     xlabel('t[sec]');
-    ylabel('[Watt]');
-    title('rpm dot');
+    ylabel('RPM Rate [rpm/s]');
+    title('RPM Rate');
     legend('show');
     hold off;
     

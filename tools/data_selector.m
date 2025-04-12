@@ -4,12 +4,14 @@ function data_list = data_selector(ac_datalist,v_a_select)
     for j = 1:length(fields)
         ac_data = ac_datalist.(fields{j});
         %Interpolating Block
-        radio_control = interp1(ac_data.ROTORCRAFT_RADIO_CONTROL.timestamp,double(ac_data.ROTORCRAFT_RADIO_CONTROL.mode),ac_data.SERIAL_ACT_T4_IN.timestamp);
-        airspeed_data = double(interp1(ac_data.AIR_DATA.timestamp,double(ac_data.AIR_DATA.airspeed),ac_data.SERIAL_ACT_T4_IN.timestamp));
+        radio_control = interp1(ac_data.ROTORCRAFT_RADIO_CONTROL.timestamp, double(ac_data.ROTORCRAFT_RADIO_CONTROL.mode), ac_data.SERIAL_ACT_T4_IN.timestamp);
+        airspeed_data = double(interp1(ac_data.AIR_DATA.timestamp,double(ac_data.AIR_DATA.airspeed), ac_data.SERIAL_ACT_T4_IN.timestamp));
         airspeed_data(isnan(airspeed_data),1) = 0;
         rpm_data = double(ac_data.SERIAL_ACT_T4_IN.motor_1_rpm);
         power_data = double(ac_data.SERIAL_ACT_T4_IN.motor_1_voltage_int.*ac_data.SERIAL_ACT_T4_IN.motor_1_current_int)./10000;
         dshot_data = double(ac_data.SERIAL_ACT_T4_OUT.motor_1_dshot_cmd);
+        rollrate_data = interp1(ac_data.IMU_GYRO_SCALED.timestamp,double(ac_data.IMU_GYRO_SCALED.gp_alt), ac_data.SERIAL_ACT_T4_IN.timestamp);
+        rollrate_data(isnan(rollrate_data),1) = 0;
         timestamp = ac_data.SERIAL_ACT_T4_IN.timestamp;
 
         %Filtering Block
@@ -22,6 +24,7 @@ function data_list = data_selector(ac_datalist,v_a_select)
         powerfilt_data = filtfilt(b, a,power_data);
         airspeedfilt_data = filtfilt(b, a,airspeed_data);
         dshotfilt_data = filtfilt(b, a,dshot_data);
+        rollratefilt_data = filtfilt(b, a, rollrate_data);
         
         
         %RPM Rate Block
@@ -33,8 +36,10 @@ function data_list = data_selector(ac_datalist,v_a_select)
             dshotrate_data(i+1) = (dshotfilt_data(i+1) - dshotfilt_data(i)) /dt;
         end
     
-        % Velocity Correction
+        % Velocity Correction for motor one 
         
+        V_correction = -0.2.*deg2rad(rollratefilt_data);
+        airspeedfilt_data = airspeedfilt_data + V_correction;
         %Cutting Block
         %gps_data = interp1(ac_data.GPS_INT.timestamp,double(ac_data.GPS_INT.airspeed),ac_data.SERIAL_ACT_T4_IN.timestamp);
         index = (find(radio_control>-1 & airspeedfilt_data>v_a_select & rpmfilt_data>1000)-1);
