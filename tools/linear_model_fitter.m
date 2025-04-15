@@ -1,10 +1,8 @@
-function [mdl,test_data] = linear_model_fitter (ac_s_datalist,set_num,rpm_order,power_order,rpmrate_order)
+function mdl = linear_model_fitter (train_data,rpm_order,power_order,rpmrate_order)
     input = [];
-    fields = fieldnames(ac_s_datalist);
-    for j = 1:set_num
-        
-        ac_data = ac_s_datalist.(fields{j});
-    end
+   
+    ac_data = train_data;
+    
     %Inlude Merge Function to merge all listed data sets
     for k = 1:rpm_order
         input(1:length(ac_data.rpm),end+1) = ac_data.rpm.^k;
@@ -20,7 +18,7 @@ function [mdl,test_data] = linear_model_fitter (ac_s_datalist,set_num,rpm_order,
     
     output = ac_data.airspeed;
     mdl = fitlm(input, output, "linear", 'Intercept', true);
-    test_data = ac_s_datalist.(fields{j+1});
+    
 
     fprintf('R^2: %.2f\n', mdl.Rsquared.Ordinary);
     fprintf('Coeff: '); fprintf('%.8f ', mdl.Coefficients.Estimate); fprintf("\n");
