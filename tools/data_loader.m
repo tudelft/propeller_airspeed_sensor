@@ -20,7 +20,8 @@ function ac_datalist = data_loader(sel)
             case "257"
                 assert(false,"Try a different dataset this one is not loaded yet")
             case "418"
-                assert(false,"Try a different dataset this one is not loaded yet")
+                p = parselog("C:\MavLab\ESC_Feedback_Log\Flight_Data\22_05_01__01_59_46_SD.data");
+                ac_data = p.aircrafts.data;
         end
         ac_datalist.("ac_data"+sel(i)) = ac_data;
     end

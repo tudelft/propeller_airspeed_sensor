@@ -11,14 +11,18 @@ close all
 addpath('tools/');
 
 % Data loading and selection
-sel = ["148","145"]; %Put the number code of the flight log you wish to use for analysis.
-ac_datalist = data_loader(sel); %You will have to change the path in this function to match where you have the files
-
-
+sel = ["144","145","148","254","418"]; %Put the number code of the flight log you wish to use for analysis.
+ac_datalist = data_loader(sel);
+%You will have to change the path in this function to match where you have the files
 %% Data Processing 
 v = 10;
 ac_s_datalist = data_selector(ac_datalist,v);
-
+%% Data Merging 
+set_num = 4; %Number of test sets 
+[train_data,test_data] = data_merger(ac_s_datalist,set_num); 
+% works to combine the training set into one large set
+%Currently only leaves one set for testing the rest are combined into a
+%training set
 %% Model Fitting 
 %Variable Entries:
 %How many data sets are used for training
@@ -26,11 +30,8 @@ ac_s_datalist = data_selector(ac_datalist,v);
 rpm_order = 2;
 power_order = 2;
 rpmrate_order = 1;
-
-[mdl,test_data] = linear_model_fitter(ac_s_datalist,1,rpm_order,power_order,rpmrate_order);
-
+mdl = linear_model_fitter(train_data,rpm_order,power_order,rpmrate_order);
 %% Model Testing 
-
 model_predict(mdl,test_data,rpm_order,power_order,rpmrate_order)
 
 
