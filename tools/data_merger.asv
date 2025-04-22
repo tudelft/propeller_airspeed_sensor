@@ -1,6 +1,15 @@
-function [train_data,test_data] = data_merger(ac_s_datalist,set_num)
+function [train_data,test_data] = data_merger(ac_s_datalist,t_list)
     names = fieldnames(ac_s_datalist);
-    if length(names) == 2 || (length(names)-setnum)
+    new_names = [];
+    %Re-ordering Block
+    for x = 1:length(names)
+        new_names(end) = names()
+    end
+    
+    ac_s_datalist = orderfields(ac_s_datalist,new_names);
+    
+    % Combination Block
+    if length(names) == 2 || (length(names)-set_num)==1
         train_data = ac_s_datalist.(names{1});
     else
         train_data = ac_s_datalist.(names{1});
@@ -18,5 +27,8 @@ function [train_data,test_data] = data_merger(ac_s_datalist,set_num)
         plot(train_data.timestamp,train_data.airspeed)
         
     end
-    test_data = ac_s_datalist.(names{end});
+    for k =1:set_num
+        test_data.(names{end-(k-1)}) = ac_s_datalist.(names{end-(k-1)});
+    end
+    %test_data = ac_s_datalist.(names{(end-(setnum-1)):end});
 end
