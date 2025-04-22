@@ -2,9 +2,7 @@ function model_predict(mdl_list,test_data,order_str)
     mdl_fields = fieldnames(mdl_list);
     for j = 1:length(mdl_fields)
         mdl = mdl_list.(mdl_fields{j});
-        rpm_order = order_str.(mdl_fields{j})(1);
-        power_order = order_str.(mdl_fields{j})(2);
-        rpmrate_order = order_str.(mdl_fields{j})(3);
+        rpmrate_order
         %Input Creation Block
         fields = fieldnames(test_data);
         for i = 1:length(fields)
@@ -27,7 +25,7 @@ function model_predict(mdl_list,test_data,order_str)
             test_ndata = ac_data.airspeed - (airspeed_pred);
             std_t =sqrt(sum(test_ndata.^2 )/(length(ac_data.airspeed)- length(mdl.CoefficientNames(1,:))));
 
-            fprintf('Standard Deviation: %4.3f m/s for model %1.0f\n', std_t,j);
+            fprintf('Standard Deviation: %.2f\n', std_t,'m/s for model',j);
 
             %Plotting Block
             
