@@ -29,7 +29,7 @@ set_num = 1; %Number of test sets
 %How many data sets are used for training
 %Order of RPM,Power,RPM rate
 rpm_order = 2;
-power_order = 3;
+power_order = 2;
 rpmrate_order = 2;
 mdl = linear_model_fitter(train_data,rpm_order,power_order,rpmrate_order);
 
