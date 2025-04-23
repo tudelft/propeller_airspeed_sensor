@@ -1,4 +1,5 @@
 function model_predict(mdl_list,test_data,order_str)
+    fprintf("------------ Model Comparison Run ------------ \n")
     mdl_fields = fieldnames(mdl_list);
     for j = 1:length(mdl_fields)
         mdl = mdl_list.(mdl_fields{j});
@@ -74,6 +75,7 @@ function model_predict(mdl_list,test_data,order_str)
             linkaxes([ax1,ax2,ax3,ax4],'x');
         end
     end
+    fprintf("------------ Comparison Complete ------------ \n")
 end
 
 
