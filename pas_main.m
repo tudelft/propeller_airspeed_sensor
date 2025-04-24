@@ -10,9 +10,11 @@ close all
 
 addpath('tools/');
 
+data_folder = 'U:\Cyclone\Pavel';
+
 % Data loading and selection
-sel = ["144","145"]; %Put the number code of the flight log you wish to use for analysis.
-ac_datalist = data_loader(sel);
+sel = ["144"]; %Put the number code of the flight log you wish to use for analysis.
+ac_datalist = data_loader(sel, data_folder);
 %You will have to change the path in this function to match where you have the files
 %% Data Processing 
 v = 10;
