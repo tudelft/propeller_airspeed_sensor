@@ -43,8 +43,8 @@ voltage = double([ac_data.SERIAL_ACT_T4_IN.motor_1_voltage_int, ac_data.SERIAL_A
 dshot = double([ac_data.SERIAL_ACT_T4_OUT.motor_1_dshot_cmd, ac_data.SERIAL_ACT_T4_OUT.motor_1_dshot_cmd]);
 power = voltage.*current;
 
-J = airspeed(:,1)./(8*2.54*rpm(:,1)/60);
-Cp = power(:,1)./(1.225*(8*2.54)^5*(rpm(:,1)/60).^3);
+J = airspeed(:,1)./(8*0.0254*rpm(:,1)/60);
+Cp = power(:,1)./(1.225*(8*0.0254)^5*(rpm(:,1)/60).^3);
 J(isinf(J)) = 0; Cp(isinf(Cp)) = 0;
 J(isnan(J)) = 0; Cp(isnan(Cp)) = 0;
 
@@ -98,7 +98,7 @@ datarange = datarange & datarange2;
 % a2 = mdl_power.Coefficients.Estimate(3);
 % 
 % J_pred = (-a1 - sqrt(a1^2 - 4*a2*(a0-Cp_filt(datarange))))/(2*a2);
-% Va_pred = J_pred.*(rpm_filt(datarange)/60)*8*2.54;
+% Va_pred = J_pred.*(rpm_filt(datarange)/60)*8*0.0254;
 % 
 % figure('Name','Airspeed from Inversion');
 % hold on; grid on; zoom on;
@@ -113,6 +113,7 @@ datarange = datarange & datarange2;
 %% fitting
 input = [power_filt(datarange,1) rpm_filt(datarange,1) , ...
          power_filt(datarange,1).^2 rpm_filt(datarange,1).^2, ...
+         power_filt(datarange,1).*rpm_filt(datarange,1), ...
          rpm_filt(datarange,1).*rpm_filtd(datarange,1)];
 output = airspeed_filt(datarange);
 
