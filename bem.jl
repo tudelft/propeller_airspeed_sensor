@@ -1,0 +1,89 @@
+using CCBlade
+using Plots
+using DataFrames
+using MAT
+
+inspectdr()
+
+rho = 1.225
+Rtip = 10/2 * 2.54 * 0.01
+Rhub = 0.10*Rtip
+B = 2
+
+rotor = Rotor(Rhub, Rtip, B)
+
+# propeller geometry
+propgeom = [
+0.15   0.130   32.76
+0.20   0.149   37.19
+0.25   0.173   33.54
+0.30   0.189   29.25
+0.35   0.197   25.64
+0.40   0.201   22.54
+0.45   0.200   20.27
+0.50   0.194   18.46
+0.55   0.186   17.05
+0.60   0.174   15.97
+0.65   0.160   14.87
+0.70   0.145   14.09
+0.75   0.128   13.39
+0.80   0.112   12.84
+0.85   0.096   12.25
+0.90   0.081   11.37
+0.95   0.061   10.19
+1.00   0.041   8.99
+]
+
+r = propgeom[:, 1] * Rtip
+chord = propgeom[:, 2] * Rtip
+theta = propgeom[:, 3] * pi/180
+
+af = AlphaAF("airfoils/naca4412.dat")
+
+sections = Section.(r, chord, theta, Ref(af))
+
+# define the range of the input to the BEM algorithm (rpm,Va)
+nRPM = 100
+nVa = 100
+Va = range(0, 30, length=nVa)
+rpm = range(0, 10000, length=nRPM)
+P = zeros(nVa,nRPM)
+# run the algorithm for the various operating points 
+for j = 1:nVa
+    for i = 1:nRPM
+        local Omega = rpm[i]*pi/30
+        local op = simple_op.(Va[j], Omega, r, rho)
+        outputs = solve.(Ref(rotor), sections, op)
+        T, Q = thrusttorque(rotor, sections, outputs)
+        eff, CT, CQ = nondim(T, Q, Va[j], Omega, rho, rotor, "propeller")
+        P[j,i] = 2π*CQ * rho * (rpm[i]/60)^3 * (2Rtip)^5
+        if j == 1 && i == 90
+            print(CQ)
+            print(rpm[i])
+        end
+    end
+end
+P[P .< 0] .= NaN
+
+# plot P vs Va for selected RPM
+plot(Va,P[:,10],  label="1000", linewidth=2, xlabel="Airspeed (m/s)", ylabel="Power (W)", show=true)
+plot!(Va,P[:,30], label="3000", linewidth=2)
+plot!(Va,P[:,50], label="5000", linewidth=2)
+plot!(Va,P[:,70], label="7000", linewidth=2)
+plot!(Va,P[:,90], label="9000", linewidth=2)
+
+# restructure the data in a (rpm,P,Va) format, using dataframes
+X = zeros(nRPM*nVa,2)
+Y = zeros(nRPM*nVa,1)
+for i = 1:nRPM
+    for j = 1:nVa
+        X[(i-1)*nVa + j,1] = rpm[i]
+        X[(i-1)*nVa + j,2] = P[j,i]
+        Y[(i-1)*nVa + j] = Va[j]
+    end
+end
+data = DataFrame(rpm=vec(X[:,1]), power=vec(X[:,2]), va = vec(Y))
+
+# save as a .mat file
+data_dict = Dict("rpm" => data.rpm, "power" => data.power, "airspeed" => data.va)
+matwrite("BEM.mat", data_dict)
