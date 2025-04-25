@@ -1,32 +1,37 @@
 figure('Name','Cp(Va,n)')
-scatter(airspeed_filt(datarange), rpm_filt(datarange)/60, 20, ...
-        Cp_filt(datarange), 'filled');
-colorbar;
-% scatter3(airspeed_filt(datarange), rpm_filt(datarange)/60, Cp_filt(datarange), 'filled');
-% xlabel('Va'); ylabel('n (rev/s)'); zlabel('C_p'); grid on;
+h = scatter3(airspeed(:), rpm(:)/60, Cp(:), [], Cp(:), 'filled');
 xlabel('Va [m/s]');
-ylabel('n [rps]');
-title('Cp(Va,n)');
-
-%%
-figure('Name','P(Va,n)')
-% scatter(airspeed_filt(datarange), rpm_filt(datarange)/60, 20, ...
-%         power(datarange,1), 'filled');
-% colorbar;
-scatter3(airspeed(datarange), rpm(datarange)/60, power(datarange,1), 'filled');
-xlabel('Va'); ylabel('n (rev/s)'); zlabel('P'); grid on;
-xlabel('Va [m/s]');
-ylabel('n [rps]');
-title('P(Va,n)');
-
-%%
-figure('Name', 'Va(P,n)');
-scatter3(power(datarange,1), rpm(datarange)/60, airspeed(datarange), 'filled');
-xlabel('P [W]');
-ylabel('n [rps]');
-zlabel('Va [m/s]');
-title('Va(P,n)');
+ylabel('omega [rpm]');
+zlabel('Cp');
+title('Cp(Va,omega)');
 grid on;
+
+colormap jet;
+colorbar;
+
+%%
+figure('Name','P(Va,omega)')
+h = scatter3(airspeed(:), rpm(:)/60, power(:,1), [], power(:,1), 'filled');
+xlabel('Va [m/s]');
+ylabel('omega [rpm]');
+zlabel('P [W]');
+title('P(Va,omega)');
+grid on;
+
+colormap bone;
+colorbar;
+
+%%
+figure('Name', 'Va(P,omega)');
+h = scatter3(power(:,1), rpm(:)/60, airspeed(:), [], airspeed(:), 'filled');
+xlabel('P [W]');
+ylabel('omega [rpm]');
+zlabel('Va [m/s]');
+title('Va(P,omega)');
+grid on;
+
+colormap bone;
+colorbar;
 
 %%
 figure('Name','Cp(J)');
@@ -45,41 +50,3 @@ xlabel('J');
 ylabel('P');
 title('P(J)');
 hold off;
-
-%%
-figure('Name','Cp(Va,n)')
-
-scatter3(airspeed_filt(datarange), ...
-         rpm_filt(datarange)/60, ...
-         Cp_filt(datarange), ...
-         30, ...                         
-         Cp_filt(datarange), ...        
-         'filled');
-
-xlabel('Va [m/s]');
-ylabel('n [rps]');
-zlabel('Cp');
-title('Cp(Va,n)');
-grid on;
-colorbar;
-
-colormap jet; 
-
-%%
-figure('Name','P(Va,n)');
-
-scatter3(airspeed_filt(datarange), ...
-         rpm_filt(datarange)/60, ...
-         power(datarange,1), ...
-         30, ...                       
-         power(datarange,1), ...         
-         'filled');
-
-xlabel('Va [m/s]');
-ylabel('n [rps]');
-zlabel('P');
-title('P(Va,n)');
-grid on;
-colorbar;
-
-colormap jet; 
