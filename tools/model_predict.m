@@ -3,21 +3,21 @@ function model_predict(mdl_list,test_data,order_str)
     mdl_fields = fieldnames(mdl_list);
     for j = 1:length(mdl_fields)
         mdl = mdl_list.(mdl_fields{j});
-        rpm_order = order_str.(mdl_fields{j})(1);
-        power_order = order_str.(mdl_fields{j})(2);
-        rpmrate_order = order_str.(mdl_fields{j})(3);
+        rpm_order = order_str.("rpm"+mdl_fields{j});
+        power_order = order_str.("power"+mdl_fields{j});
+        rpmrate_order = order_str.("omega"+mdl_fields{j});
         %Input Creation Block
         fields = fieldnames(test_data);
         for i = 1:length(fields)
             input = [];
             ac_data = test_data.(fields{i});
-            for k = 1:rpm_order
+            for k = rpm_order
                 input(1:length(ac_data.rpm),end+1) = ac_data.rpm.^k;
             end
-            for k = 1:power_order
+            for k = power_order
                 input(1:length(ac_data.rpm),end+1) = ac_data.power.^k;
             end
-            for k = 1:rpmrate_order
+            for k = rpmrate_order
                 input(1:length(ac_data.rpm),end+1) = ac_data.rpmrate.^k;
             end
             input(1:length(ac_data.power),end+1) = ac_data.power .* ac_data.rpm;
