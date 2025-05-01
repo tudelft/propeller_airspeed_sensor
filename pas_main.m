@@ -10,15 +10,21 @@ close all
 
 addpath('tools/');
 
-data_folder = 'U:\Cyclone\Pavel';
+data_folder = "C:\MavLab\ESC_Feedback_Log\Pavel";
 
 % Data loading and selection
-sel = ["144"]; %Put the number code of the flight log you wish to use for analysis.
+sel = ["144","145"]; %Put the number code of the flight log you wish to use for analysis.
 ac_datalist = data_loader(sel, data_folder);
-%You will have to change the path in this function to match where you have the files
+
+
+
 %% Data Processing 
 v = 10;
 ac_s_datalist = data_selector(ac_datalist,v);
+
+%% Run Breakpoint to load the OJF data 
+OJF_data = OJF_data_loader(data_folder);
+ac_s_datalist.OJFac_data = OJF_data; 
 %% Data Merging 
 set_num = 1; %Number of test sets
 %t_list = {"ac_data144", "ac_data145"};
@@ -30,9 +36,9 @@ set_num = 1; %Number of test sets
 %Variable Entries:
 %How many data sets are used for training
 %Order of RPM,Power,RPM rate
-rpm_order = 2;
-power_order = 2;
-rpmrate_order = 2;
+rpm_order = [1,2];
+power_order = [1,2];
+rpmrate_order = [1,2];
 mdl = linear_model_fitter(train_data,rpm_order,power_order,rpmrate_order);
 
 %% Model Save
@@ -40,7 +46,9 @@ mdl = linear_model_fitter(train_data,rpm_order,power_order,rpmrate_order);
 %Simply generate a new model above then add it by running this breakpoint
 i = length(fieldnames(mdl_str))+1;
 mdl_str.("mdl" + num2str(i)) = mdl;
-order_str.("mdl" + num2str(i)) = [rpm_order power_order rpmrate_order];
+order_str.("rpm"+"mdl" + num2str(i)) = rpm_order;
+order_str.("power"+"mdl" + num2str(i)) =  power_order ;
+order_str.("omega"+"mdl" + num2str(i)) =  rpmrate_order;
 %% Model Clear 
 %Clears the model list
 i = 0;

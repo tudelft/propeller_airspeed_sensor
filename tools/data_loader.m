@@ -18,7 +18,8 @@ function ac_datalist = data_loader(sel, data_folder)
                 p = parselog(data_folder + "\20250117_valken_first_succ_manual\0254\25_01_17__15_36_58_SD.data");
                 ac_data = p.aircrafts.data;
             case "257"
-                assert(false,"Try a different dataset this one is not loaded yet")
+                p = parselog(data_folder + "\20250117_valken_first_succ_manual\0257\25_01_17__15_36_58_SD.data");
+                ac_data = p.aircrafts.data;
             case "418"
                 p = parselog(data_folder + "\20250307_valken_spiral\0418\22_05_01__01_59_46_SD.data");
                 ac_data = p.aircrafts.data;
