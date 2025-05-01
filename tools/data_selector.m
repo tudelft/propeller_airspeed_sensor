@@ -20,7 +20,7 @@ function data_list = data_selector(ac_datalist,v_a_select)
         %Filtering Block
         fs = 500 ; 
         dt = 1/fs;
-        filter_freq = 5;
+        filter_freq = 20;
         [b, a] = butter(2,filter_freq/(fs/2));
         
         rpmfilt_data= filtfilt(b, a,rpm_data);
@@ -48,10 +48,10 @@ function data_list = data_selector(ac_datalist,v_a_select)
         % Velocity Correction #2 Due to the airspeed offset at the starting
         %condition.)
         
-        land_cond = find(vertfilt_speed<0.1 & rpmfilt_data<50 & vertfilt_speed> -0.1);
-        V_correction2 = mean(airspeedfilt_data(land_cond));
+        %land_cond = find(vertfilt_speed<0.1 & rpmfilt_data<50 & vertfilt_speed> -0.1);
+        %V_correction2 = mean(airspeedfilt_data(land_cond));
 
-        airspeedfilt_data = airspeedfilt_data - V_correction2;
+        %airspeedfilt_data = airspeedfilt_data - V_correction2;
 
         %Cutting Block
         %gps_data = interp1(ac_data.GPS_INT.timestamp,double(ac_data.GPS_INT.airspeed),ac_data.SERIAL_ACT_T4_IN.timestamp);

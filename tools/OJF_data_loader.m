@@ -1,14 +1,125 @@
-function OJF_data_loader(data_folder)
+function OJF_data = OJF_data_loader(data_folder)
     
     p1 = parselog(data_folder+ "\20250407_OJF\0061\25_04_07__18_32_42_SD_no_GPS.data");
     ac_data1 = p1.aircrafts.data;
     p2 = parselog(data_folder+ "\20250407_OJF\0062\25_04_07__19_28_56_SD_no_GPS.data");
     ac_data2 = p2.aircrafts.data;
+
+    %Data Interpolation and filtering 
+    
+    rpm_data1 = double(ac_data1.SERIAL_ACT_T4_IN.motor_1_rpm);
+    power_data1 = double(ac_data1.SERIAL_ACT_T4_IN.motor_1_voltage_int.*ac_data1.SERIAL_ACT_T4_IN.motor_1_current_int)./10000;
+    dshot_data1 = double(ac_data1.SERIAL_ACT_T4_OUT.motor_1_dshot_cmd);
+    timestamp1 = ac_data1.SERIAL_ACT_T4_IN.timestamp;
+
+    rpm_data2 = double(ac_data2.SERIAL_ACT_T4_IN.motor_1_rpm);
+    power_data2 = double(ac_data2.SERIAL_ACT_T4_IN.motor_1_voltage_int.*ac_data2.SERIAL_ACT_T4_IN.motor_1_current_int)./10000;
+    dshot_data2 = double(ac_data2.SERIAL_ACT_T4_OUT.motor_1_dshot_cmd);
+    timestamp2 = ac_data2.SERIAL_ACT_T4_IN.timestamp;
+    
+    fs = 500 ; 
+    dt = 1/fs;
+    filter_freq = 20;
+    [b, a] = butter(2,filter_freq/(fs/2));
+    rpmfilt_data1= filtfilt(b, a,rpm_data1);
+    powerfilt_data1 = filtfilt(b, a,power_data1); 
+    dshotfilt_data1 = filtfilt(b, a,dshot_data1);
+    rpmrate_data1 = zeros(length(rpm_data1),1);
+    dshotrate_data1 = zeros(length(dshot_data1),1);
+    for i = 1:length(rpm_data1)-1
+        rpmrate_data1(i+1) = (rpmfilt_data1(i+1)-rpmfilt_data1(i))/ dt; %Order one numerical deferentiation (improve later)
+        dshotrate_data1(i+1) = (dshotfilt_data1(i+1) - dshotfilt_data1(i)) /dt;
+    end
+
+    rpmfilt_data2= filtfilt(b, a,rpm_data2);
+    powerfilt_data2 = filtfilt(b, a,power_data2); 
+    dshotfilt_data2 = filtfilt(b, a,dshot_data2);
+    rpmrate_data2 = zeros(length(rpm_data2),1);
+    dshotrate_data2 = zeros(length(dshot_data2),1);
+    for i = 1:length(rpm_data1)-1
+        rpmrate_data2(i+1) = (rpmfilt_data2(i+1)-rpmfilt_data2(i))/ dt; %Order one numerical deferentiation (improve later)
+        dshotrate_data2(i+1) = (dshotfilt_data2(i+1) - dshotfilt_data2(i)) /dt;
+    end
+
+    timeshift = timestamp1(end);
+    timestamp2 = timestamp2 + timeshift-timestamp2(1);
+    timestamp = [timestamp1; timestamp2];
+    rpm_data = [rpmfilt_data1;rpm_data2];
+    power_data = [powerfilt_data1;power_data2];
+    rpmrate_data = [rpmrate_data1;rpmrate_data2];
+    dshot_data = [dshotfilt_data1;dshotfilt_data2];
+    dshotrate_data = [dshotrate_data1; dshotrate_data2];
+
+
+    speed_range =[0,4.9,9.93,15,18.02];
+    airspeed_data = zeros(length(timestamp),1);
+    angle_data = zeros(length(timestamp),1);
+    tranges_0deg =[343 453; 515 625; 693 800; 873 957; 1106 1192];
+    datarange_0deg = [];
+    for i = 1:size(tranges_0deg(:,1))
+        trange = tranges_0deg(i,:);
+        datarange_start = find(timestamp > trange(1), 1, 'first') - 1;
+        datarange_end = find(timestamp > trange(2), 1, 'first') - 1;    
+        datarange_0deg = [datarange_0deg datarange_start:datarange_end];
+        airspeed_data(datarange_start:datarange_end) = speed_range(i);
+        
+
+    end
+
+    tranges_30deg =[1408 1495; 1535 1621;1657 1742;1804 1889];
+    datarange_30deg = [];
+    for i = 1:size(tranges_30deg(:,1))
+        trange = tranges_30deg(i,:);
+        datarange_start = find(timestamp > trange(1), 1, 'first') - 1;
+        datarange_end = find(timestamp > trange(2), 1, 'first') - 1;    
+        datarange_30deg = [datarange_30deg datarange_start:datarange_end];
+        airspeed_data(datarange_start:datarange_end) = speed_range(i+1);
+        angle_data(datarange_start:datarange_end) = 30;
+    end
+    tranges_60deg =[2012 2097;2164 2251; 2292 2377; 2402 2486];
+    datarange_60deg = [];
+    for i = 1:size(tranges_60deg(:,1))
+        trange = tranges_60deg(i,:);
+        datarange_start = find(timestamp > trange(1), 1, 'first') - 1;
+        datarange_end = find(timestamp > trange(2), 1, 'first') - 1;    
+        datarange_60deg = [datarange_60deg datarange_start:datarange_end];
+        airspeed_data(datarange_start:datarange_end) = speed_range(i+1);
+        angle_data(datarange_start:datarange_end) = 60;
+    end
+    
+    
+    
+
+    % Data Rewriting (Changing the data to the naming scheme used in the
+    % rest of the script)
+
+    
+    
+    % Velocity Application
+    
+    %Angle0 V0 [343 453] V5 [515 625] V10 [693 800] V15[873 957] 
+    %Other file due to breakage do the cuttof at 2000 rpm
+    % V18 [141 226] 
+    %Angle 30 V5 [445 530] V10 [568 655] V15 [692 776] V18 [837 923]
+    %Angle 60 V5 [1046 1131] V10 [1199 1285] V15 [1326 1411] V18 [1435 1520]
+
+
+    %Angle Application
     
     
     %rpm_data = double(ac_data.SERIAL_ACT_T4_IN.motor_1_rpm);
     %power_data = double(ac_data.SERIAL_ACT_T4_IN.motor_1_voltage_int.*ac_data.SERIAL_ACT_T4_IN.motor_1_current_int)./10000;
     
     %ac_datalist.OJF_data = ac_data2; %replace soon
+    index =(find(rpm_data>2000)-1);
+    OJF_data.airspeed = airspeed_data(index);
+    OJF_data.rpm = rpm_data(index);
+    OJF_data.power = power_data();
+    OJF_data.rpmrate = rpmrate_data(index);
+    OJF_data.timestamp = timestamp(index);
+    OJF_data.dshot = dshot_data(index);
+    OJF_data.dshotrate = dshotrate_data(index);
+        
+
 
 end
