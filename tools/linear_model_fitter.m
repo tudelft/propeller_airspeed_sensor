@@ -4,15 +4,16 @@ function mdl = linear_model_fitter (train_data,rpm_order,power_order,rpmrate_ord
     ac_data = train_data;
     
     %Inlude Merge Function to merge all listed data sets
-    for k = 1:rpm_order
+    for k = rpm_order
         input(1:length(ac_data.rpm),end+1) = ac_data.rpm.^k;
     end
-    for k = 1:power_order
+    for k = power_order
         input(1:length(ac_data.rpm),end+1) = ac_data.power.^k;
     end
-    for k = 1:rpmrate_order
+    for k = rpmrate_order
         input(1:length(ac_data.rpm),end+1) = ac_data.rpmrate.^k;
     end
+    input(1:length(ac_data.power),end+1) = ac_data.power .* ac_data.rpm;
     input(1:length(ac_data.dshot),end+1) = ac_data.dshot;
     input(1:length(ac_data.dshotrate),end+1) = ac_data.dshotrate;
     

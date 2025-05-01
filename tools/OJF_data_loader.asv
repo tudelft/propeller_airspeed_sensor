@@ -1,0 +1,10 @@
+function OJF_data_loader(ac_datalist,data_folder)
+    
+    p1 = parselog(data_folder+ "\20250407_OJF\0061\25_04_07__18_32_42_SD_no_GPS.data");
+    ac_data1 = p1.aircrafts.data;
+    p2 = parselog(data_folder+ "\20250407_OJF\0062\25_04_07__19_28_56_SD_no_GPS.data");
+    ac_data2 = p2.aircrafts.data;
+
+    ac_datalist.OJF_data = ac
+
+end

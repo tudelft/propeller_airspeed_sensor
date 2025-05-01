@@ -20,6 +20,7 @@ function model_predict(mdl_list,test_data,order_str)
             for k = 1:rpmrate_order
                 input(1:length(ac_data.rpm),end+1) = ac_data.rpmrate.^k;
             end
+            input(1:length(ac_data.power),end+1) = ac_data.power .* ac_data.rpm;
             input(1:length(ac_data.dshot),end+1) = ac_data.dshot;
             input(1:length(ac_data.dshotrate),end+1) = ac_data.dshotrate;
 
