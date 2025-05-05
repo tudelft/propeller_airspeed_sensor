@@ -5,7 +5,7 @@
 % mdl: Current model fitted to the data
 % mdl_list: list of models currently under anlysis
 
-clear p ac_datalist ac_s_datalist train_data test_data
+clear p ac_datalist train_data test_data
 close all
 
 addpath('tools/');
@@ -36,9 +36,9 @@ set_num = 1; %Number of test sets
 %Variable Entries:
 %How many data sets are used for training
 %Order of RPM,Power,RPM rate
-rpm_order = [1,2];
-power_order = [1,2];
-rpmrate_order = [1,2];
+rpm_order = [-2,1,2];
+power_order = [-2,1,2];
+rpmrate_order = [-1,1,2];
 mdl = linear_model_fitter(train_data,rpm_order,power_order,rpmrate_order);
 
 %% Model Save

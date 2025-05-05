@@ -47,15 +47,12 @@ function data_list = data_selector(ac_datalist,v_a_select)
 
         % Velocity Correction #2 Due to the airspeed offset at the starting
         %condition.)
-        
-        %land_cond = find(vertfilt_speed<0.1 & rpmfilt_data<50 & vertfilt_speed> -0.1);
-        %V_correction2 = mean(airspeedfilt_data(land_cond));
-
-        %airspeedfilt_data = airspeedfilt_data - V_correction2;
+        index = (find(radio_control>-1 & airspeedfilt_data>v_a_select & rpmfilt_data>1000)-1);
+        airspeedfilt_data = gps_offset_correction(ac_data,airspeedfilt_data,index,timestamp);
 
         %Cutting Block
         %gps_data = interp1(ac_data.GPS_INT.timestamp,double(ac_data.GPS_INT.airspeed),ac_data.SERIAL_ACT_T4_IN.timestamp);
-        index = (find(radio_control>-1 & airspeedfilt_data>v_a_select & rpmfilt_data>1000)-1);
+        
        
         data.airspeed = airspeedfilt_data(index);
         data.rpm = rpmfilt_data(index);
