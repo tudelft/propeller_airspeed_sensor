@@ -4,9 +4,9 @@ close all;
 %% 
 
 % 144
-% tranges = [260 290; 300 320];
+ tranges = [260 290; 300 320];
 % 145
-tranges = [470 590];
+%tranges = [470 590];
 
 %%
 t = ac_data.SERIAL_ACT_T4_IN.timestamp;
