@@ -1,5 +1,7 @@
-function airspeedfilt_data = gps_offset_correction(ac_data,airspeedfilt_data,index,timestamp);
+function airspeedfilt_data = gps_offset_correction(ac_data,airspeedfilt_data,index,timestamp)
     index = index(length(index)*0.5:length(index)*0.6);
+    fprint("Start Time %2.0f \n", timestamp(index(1)))
+    fprint("End Time %2.0f \n", timestamp(index(end)))
     quat = double([ac_data.AHRS_REF_QUAT.body_qi ac_data.AHRS_REF_QUAT.body_qx ac_data.AHRS_REF_QUAT.body_qy ac_data.AHRS_REF_QUAT.body_qz]);
     %refquat = double([ac_data.AHRS_REF_QUAT.ref_qi ac_data.AHRS_REF_QUAT.ref_qx ac_data.AHRS_REF_QUAT.ref_qy ac_data.AHRS_REF_QUAT.ref_qz]);
     [refquat_t,irefquat_t,~] = unique(ac_data.AHRS_REF_QUAT.timestamp);
