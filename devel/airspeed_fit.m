@@ -1,14 +1,13 @@
 % clear; 
-% close all;
+close all;
 
 %% 
-% load('reduced_flight_logs/144.mat');
 
 % 144
-% tranges = [253 333];
+tranges = [253 333]; corr_factor = 1;
 % 145
 % tranges = [470 596];
-tranges = [400 700];
+% tranges = [400 700];
 
 % 0061 mat
 % tranges = [128 232; 344 446; 518 620; 692 794; 875 950];
@@ -18,24 +17,24 @@ tranges = [400 700];
 % tranges = [1 2590];
 
 %%
+t = ac_data.SERIAL_ACT_T4_IN.timestamp;
 fs = 500;
 
-datarange = [];
+datarange = zeros(length(t),1);
 for i = 1:size(tranges,1)
     trange = tranges(i,:);
     idx = ac_data.SERIAL_ACT_T4_IN.timestamp >= trange(1) & ...
           ac_data.SERIAL_ACT_T4_IN.timestamp <= trange(2);
-    datarange = [datarange idx];
+    datarange = datarange | idx;
 end
 datarange = logical(datarange);
 
 %%
-t = ac_data.SERIAL_ACT_T4_IN.timestamp;
 
 % gyro = [ac_data.IMU_GYRO_SCALED.gp_alt ac_data.IMU_GYRO_SCALED.gq_alt ac_data.IMU_GYRO_SCALED.gr_alt]/180*pi;
 % gyro = interp1(ac_data.IMU_GYRO_SCALED.timestamp, gyro, t, "linear", "extrap");
 
-airspeed = interp1(ac_data.AIR_DATA.timestamp, ac_data.AIR_DATA.airspeed, t, "linear", "extrap");
+airspeed = corr_factor*interp1(ac_data.AIR_DATA.timestamp, ac_data.AIR_DATA.airspeed, t, "linear", "extrap");
 % angle = interp1(ac_data.AIR_DATA.timestamp, ac_data.AIR_DATA.angle, t, "linear", "extrap");
 rpm = double([ac_data.SERIAL_ACT_T4_IN.motor_1_rpm, ac_data.SERIAL_ACT_T4_IN.motor_2_rpm]);
 current = double([ac_data.SERIAL_ACT_T4_IN.motor_1_current_int, ac_data.SERIAL_ACT_T4_IN.motor_2_current_int])/100;
@@ -159,7 +158,7 @@ ax4 = nexttile;
 hold on; grid on; zoom on;
 plot(t(datarange), rpm_filtd(datarange,1), '.', DisplayName="rpm dot", LineWidth=1.5);
 xlabel('t[sec]');
-ylabel('[Watt]');
+ylabel('');
 title('rpm dot');
 legend('show');
 hold off;
