@@ -1,11 +1,21 @@
-function dispModelInfo(FitInfo, names, coeff, idx)
+function dispModelInfo(Y_real, Y_pred, names, coeff)
     fprintf('\n-------------------------------------\n');
-    fprintf('Cross-validated MSE: %.3f\n', FitInfo.MSE(idx))
-    fprintf('Selected features and coefficients:\n');
+    
+    MSE = mean((Y_real - Y_pred).^2);
+    fprintf('RMSE:  %.2f\n', sqrt(MSE))
+    % fprintf('nRMSE: %.2f\n', sqrt(MSE/std(Y_real)))
 
-    nonzeroIdx = find(coeff ~= 0);
-    for k = 1:length(nonzeroIdx)
-        idx = nonzeroIdx(k);
-        fprintf('%s:\t%.25f\n', names{idx}, coeff(idx));
-    end
+    SSE = sum((Y_real - Y_pred).^2);
+    SST = sum((Y_real - mean(Y_real)).^2);
+    Rsquared = 1 - SSE/SST;
+    fprintf('R2:    %.2f\n', Rsquared)
+
+    % if nargin == 4 && ~isempty(names) && ~isempty(coeff)
+        fprintf('# Selected features and coefficients #\n');
+        nonzeroIdx = find(coeff ~= 0);
+        for k = 1:length(nonzeroIdx)
+            index = nonzeroIdx(k);
+           fprintf('%s:\t%.2e\n', names{index}, coeff(index));
+        end
+    % end
 end
