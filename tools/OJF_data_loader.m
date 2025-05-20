@@ -19,7 +19,7 @@ function OJF_data = OJF_data_loader(data_folder)
     
     fs = 500 ; 
     dt = 1/fs;
-    filter_freq = 20;
+    filter_freq = 5;
     [b, a] = butter(2,filter_freq/(fs/2));
     rpmfilt_data1= filtfilt(b, a,rpm_data1);
     powerfilt_data1 = filtfilt(b, a,power_data1); 
@@ -36,7 +36,7 @@ function OJF_data = OJF_data_loader(data_folder)
     dshotfilt_data2 = filtfilt(b, a,dshot_data2);
     rpmrate_data2 = zeros(length(rpm_data2),1);
     dshotrate_data2 = zeros(length(dshot_data2),1);
-    for i = 1:length(rpm_data1)-1
+    for i = 1:length(rpm_data2)-1
         rpmrate_data2(i+1) = (rpmfilt_data2(i+1)-rpmfilt_data2(i))/ dt; %Order one numerical deferentiation (improve later)
         dshotrate_data2(i+1) = (dshotfilt_data2(i+1) - dshotfilt_data2(i)) /dt;
     end
@@ -105,13 +105,9 @@ function OJF_data = OJF_data_loader(data_folder)
 
 
     %Angle Application
-    
-    
-    %rpm_data = double(ac_data.SERIAL_ACT_T4_IN.motor_1_rpm);
-    %power_data = double(ac_data.SERIAL_ACT_T4_IN.motor_1_voltage_int.*ac_data.SERIAL_ACT_T4_IN.motor_1_current_int)./10000;
-    
+     
     %ac_datalist.OJF_data = ac_data2; %replace soon
-    index =(find(rpm_data>2000)-1);
+    index =(find(rpm_data>2000 & airspeed_data>4)-1);
     OJF_data.airspeed = airspeed_data(index);
     OJF_data.rpm = rpm_data(index);
     OJF_data.power = power_data(index);
@@ -119,7 +115,34 @@ function OJF_data = OJF_data_loader(data_folder)
     OJF_data.timestamp = timestamp(index);
     OJF_data.dshot = dshot_data(index);
     OJF_data.dshotrate = dshotrate_data(index);
-        
 
+    %Sanity Check
+
+    J = airspeed_data./(8*0.0254*rpm_data/60);
+    Cp = power_data./(1.225*(8*0.0254)^5*(rpm_data/60).^3);
+    time0_index = timestamp>= tranges_0deg(1)& timestamp <=tranges_0deg(end);
+    time30_index = timestamp>= tranges_30deg(1)& timestamp <=tranges_30deg(end);
+    time60_index = timestamp>= tranges_60deg(1)& timestamp <=tranges_60deg(end);
+    index = rpm_data>4000 & airspeed_data>=3 &J>0.15 & power_data >=30 & rpm_data<10000 & rpmrate_data<250 & rpmrate_data>-250;
+    index0 = time0_index & index;
+    index30 = time30_index & index;
+    index60 = time60_index & index;
+    J(isinf(J)) = 0; Cp(isinf(Cp)) = 0;
+    J(isnan(J)) = 0; Cp(isnan(Cp)) = 0;
+    input = [J(index60) J(index60).^2];
+    output = Cp(index60);
+    mdl_power = fitlm(input, output, "linear", 'Intercept', true);
+    j_test = [transpose(0.15:0.01:1) transpose((0.15:0.01:1).^2) ];
+    cp_test = predict(mdl_power,j_test);
+    figure("Name","60deg CP vs J");
+    hold on; grid on; zoom on;
+    plot(J(index60),Cp(index60),'.')
+    plot(j_test(:,1), cp_test, '.', MarkerEdgeColor='r', DisplayName="Predicted");
+    xlabel("Advance Ratio (J)")
+    ylabel("C_p")
+    
+    
+    
+    
 
 end
