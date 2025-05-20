@@ -8,7 +8,7 @@ function dispModelInfo(Y_real, Y_pred, names, coeff)
     SSE = sum((Y_real - Y_pred).^2);
     SST = sum((Y_real - mean(Y_real)).^2);
     Rsquared = 1 - SSE/SST;
-    fprintf('R2:    %.2f\n', Rsquared)
+    % fprintf('R2:    %.2f\n', Rsquared)
 
     % if nargin == 4 && ~isempty(names) && ~isempty(coeff)
         fprintf('# Selected features and coefficients #\n');

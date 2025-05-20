@@ -15,7 +15,7 @@ function [X, termNames] = genFeatures_Pw(power, rpm, iRange, jRange)
                 continue; 
             end
             
-            termLabel = sprintf('P^%d_w^%d', i, j);
+            termLabel = sprintf('P^%d*w^%d', i, j);
             termNames{end+1} = termLabel;
             
             Pi = power.^abs(i); if i < 0, Pi = 1 ./ (Pi + epsVal); end
