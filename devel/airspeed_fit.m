@@ -2,10 +2,21 @@ clear;
 close all;
 
 %% user input
-load('/home/ntouev/MATLAB/propeller_airspeed_sensor/post_data/flight/144-145-148.mat')
+load('/home/ntouev/MATLAB/propeller_airspeed_sensor/post_data/flight/144.mat')
+tranges = [250 326]; % whole (144-145-148)
+% tranges = [250 326; 497 517; 918 1051; 1051.1 1163; 1363 1486];
+
+% load('/home/ntouev/MATLAB/propeller_airspeed_sensor/post_data/flight/0254-0257.mat')
+% tranges = [0 1600]; % whole (0254 - 0257)
+% tranges = [0 980]; % 0254
+% tranges = [840 980; 1430 1443; 1554 1566; 1585 1598];
+
+% load('/home/ntouev/MATLAB/propeller_airspeed_sensor/post_data/flight/0418.mat')
+% tranges = [545 600; 650 670; 693 725];
+
 LASSO_EXPLORE = false;
-idx_Va = 69; %65;
-idx_J = 58; %55;
+idx_Va = 72;
+idx_J = 58;
 
 %%
 corr_factor = 1;
@@ -43,39 +54,40 @@ J = airspeed./((rpm/60)*(10*0.0254));
 Cp = power./(1.225*(10*0.0254)^5*(rpm/60).^3);
 
 %% derivatives
-rpm_d = [zeros(1,1); diff(rpm,1)]*fs;
+rpm_dot = [zeros(1,1); diff(rpm,1)]*fs;
 
 %%
-datarange = airspeed>5 & power>10 & (theta<-70 & theta>-110); 
+datarange = zeros(length(t),1);
+for i = 1:size(tranges,1)
+    trange = tranges(i,:);
+    idx = t >= trange(1) & t <= trange(2);
+    datarange = datarange | idx;
+end
+datarange = logical(datarange);
+
+datarange = datarange & airspeed>5 & power>10 & (theta<-70 & theta>-110); 
 datarange = datarange & J>0.3;
 
 %% Fit
 if LASSO_EXPLORE
     [X_Va, names_Va] = genFeatures_Pw(power, rpm, -6:1:6, -6:1:6);
-    [X_Va, names_Va] = appendFeature(X_Va, rpm.*rpm_d, names_Va, 'rpm_rpmd');
+    [X_Va, names_Va] = appendFeature(X_Va, rpm.*rpm_dot, names_Va, 'rpm_rpmd');
     [B_Va, FitInfo_Va] = lasso(X_Va(datarange,:), airspeed(datarange), 'CV', 10);
-    lassoPlot(B_Va, FitInfo_Va, 'PlotType', 'CV'); legend show;
+    % lassoPlot(B_Va, FitInfo_Va, 'PlotType', 'CV'); legend show;
     
     [X_J, names_J] = genFeatures_Cp(Cp, -4:4);
     [B_J, FitInfo_J] = lasso(X_J(datarange,:), J(datarange), 'CV', 10);
-    lassoPlot(B_J, FitInfo_J, 'PlotType', 'CV'); legend show;
+    % lassoPlot(B_J, FitInfo_J, 'PlotType', 'CV'); legend show;
 
     intercept_Va = FitInfo_Va.Intercept(idx_Va);
     coeff_Va = B_Va(:, idx_Va);
     intercept_J = FitInfo_J.Intercept(idx_J);
     coeff_J = B_J(:, idx_J);
 else
-    X_Va = [power.^(-1).*rpm.^5 ,...
-            power.^(-1).*rpm.^6, ...
-            power.^(1).*rpm.^-3, ...
-            rpm.*rpm_d];
-    names_Va = {'p^-1_w^5', 'p^-1_w^6', 'p^1_w^-3', 'rpm_rpmd'};
+    [X_Va, names_Va] = model_structure_Pw(power, rpm, rpm_dot, 'bem_reduced_wdot');
     [B_Va, FitInfo_Va] = lasso(X_Va(datarange,:), airspeed(datarange), 'Lambda', 1e-10);
     
-    X_J = [Cp.^-3 Cp.^-1 Cp.^2];
-    % X_J = [Cp.^1 Cp.^4];
-    names_J = {'Cp^-3', 'Cp^-1', 'Cp^2'};
-    % names_J = {'Cp^1', 'Cp^4'};
+    [X_J, names_J] = model_structure_Cp(Cp, 'bem_reduced');    
     [B_J, FitInfo_J] = lasso(X_J(datarange,:), J(datarange), 'Lambda', 1e-10); 
 
     intercept_Va = FitInfo_Va.Intercept;
@@ -104,3 +116,9 @@ xlabel('t [sec]');
 ylabel('Airspeed');
 title('Airspeed prediction');
 grid on;
+
+%% save the model
+% save('/home/ntouev/MATLAB/propeller_airspeed_sensor/models/144.mat', ...
+%      'names_Va', 'names_J', ...
+%      'coeff_Va', 'coeff_J', ...
+%      'intercept_Va', 'intercept_J');
