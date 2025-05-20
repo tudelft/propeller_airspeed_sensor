@@ -120,6 +120,7 @@ function OJF_data = OJF_data_loader(data_folder)
 
     J = airspeed_data./(8*0.0254*rpm_data/60);
     Cp = power_data./(1.225*(8*0.0254)^5*(rpm_data/60).^3);
+    col = (rpm_data);
     time0_index = timestamp>= tranges_0deg(1)& timestamp <=tranges_0deg(end);
     time30_index = timestamp>= tranges_30deg(1)& timestamp <=tranges_30deg(end);
     time60_index = timestamp>= tranges_60deg(1)& timestamp <=tranges_60deg(end);
@@ -136,8 +137,12 @@ function OJF_data = OJF_data_loader(data_folder)
     cp_test = predict(mdl_power,j_test);
     figure("Name","60deg CP vs J");
     hold on; grid on; zoom on;
-    plot(J(index60),Cp(index60),'.')
+    colormap("turbo")
+    scatter(J(index60),Cp(index60),10,col(index60),"filled")
+    
     plot(j_test(:,1), cp_test, '.', MarkerEdgeColor='r', DisplayName="Predicted");
+    c = colorbar;
+    c.Label.String = 'RPM';
     xlabel("Advance Ratio (J)")
     ylabel("C_p")
     

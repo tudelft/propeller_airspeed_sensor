@@ -36,7 +36,7 @@ function OJF_data = OJF_data_loader(data_folder)
     dshotfilt_data2 = filtfilt(b, a,dshot_data2);
     rpmrate_data2 = zeros(length(rpm_data2),1);
     dshotrate_data2 = zeros(length(dshot_data2),1);
-    for i = 1:length(rpm_data1)-1
+    for i = 1:length(rpm_data2)-1
         rpmrate_data2(i+1) = (rpmfilt_data2(i+1)-rpmfilt_data2(i))/ dt; %Order one numerical deferentiation (improve later)
         dshotrate_data2(i+1) = (dshotfilt_data2(i+1) - dshotfilt_data2(i)) /dt;
     end
@@ -120,24 +120,31 @@ function OJF_data = OJF_data_loader(data_folder)
 
     J = airspeed_data./(8*0.0254*rpm_data/60);
     Cp = power_data./(1.225*(8*0.0254)^5*(rpm_data/60).^3);
+    col = (airspeed_data.*rpm_data);
     time0_index = timestamp>= tranges_0deg(1)& timestamp <=tranges_0deg(end);
     time30_index = timestamp>= tranges_30deg(1)& timestamp <=tranges_30deg(end);
     time60_index = timestamp>= tranges_60deg(1)& timestamp <=tranges_60deg(end);
-    index = rpm_data>1000 & airspeed_data>=0 &J>0.15 & power_data >=20 & rpm_data<10000 & rpmrate_data(:,1)<1000 & rpmrate_data(:,1)>-1000;
+    index = rpm_data>4000 & airspeed_data>=3 &J>0.15 & power_data >=30 & rpm_data<10000 & rpmrate_data<250 & rpmrate_data>-250;
     index0 = time0_index & index;
     index30 = time30_index & index;
     index60 = time60_index & index;
     J(isinf(J)) = 0; Cp(isinf(Cp)) = 0;
     J(isnan(J)) = 0; Cp(isnan(Cp)) = 0;
-    input = [J(index0) J(index0).^2];
-    output = Cp(index0);
+    input = [J(index60) J(index60).^2];
+    output = Cp(index60);
     mdl_power = fitlm(input, output, "linear", 'Intercept', true);
-    j_test = [transpose(0.15:0.01:0.8) transpose(0.15:0.01:0.8)^2 ];
+    j_test = [transpose(0.15:0.01:1) transpose((0.15:0.01:1).^2) ];
     cp_test = predict(mdl_power,j_test);
-    figure();
+    figure("Name","60deg CP vs J");
     hold on; grid on; zoom on;
-    plot(J(index0),Cp(index0),'.')
-    plot(j_test, cp_test, '.', MarkerEdgeColor='r', DisplayName="Predicted");
+    colormap("turbo")
+    scatter(J(index60),Cp(index60),10,col(index60),"filled")
+    
+    plot(j_test(:,1), cp_test, '.', MarkerEdgeColor='r', DisplayName="Predicted");
+    c = colorbar;
+    c.Label.String = 'Airspeed(m/s) * '
+    xlabel("Advance Ratio (J)")
+    ylabel("C_p")
     
     
     
