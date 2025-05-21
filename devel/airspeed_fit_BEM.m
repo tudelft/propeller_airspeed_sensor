@@ -1,6 +1,9 @@
 % clear; 
 close all;
 
+%%
+addpath('/home/ntouev/MATLAB/propeller_airspeed_sensor/tools/');
+
 %% user input
 load('/home/ntouev/MATLAB/propeller_airspeed_sensor/post_data/BEM/BEM_t.mat')
 LASSO_EXPLORE = false;
@@ -11,6 +14,44 @@ idx_J = 30;
 t = 1:1:10000;
 J = airspeed./((rpm/60)*(10*0.0254));
 Cp = power./(1.225*(10*0.0254)^5*(rpm/60).^3);
+
+%% Find Jcrit
+X_Cp = [J J.^2 J.^3];
+[B_Cp, FitInfo_Cp] = lasso(X_Cp, Cp, 'Lambda', 1e-10);
+
+intercept_Cp = FitInfo_Cp.Intercept;
+coeff_Cp = B_Cp;
+Cp_hat = X_Cp * coeff_Cp + intercept_Cp;
+names_Cp = {'J', 'J^2', 'J^3'};
+
+% weird hardcoded stuff to get rid of NaNs and calculate RMSE properly
+tempCp = Cp(J<=0.7);
+tempCp(isnan(tempCp)) = 0;
+tempCp_hat = Cp_hat(J<=0.7);
+tempCp_hat(isnan(tempCp_hat)) = 0;
+dispModelInfo(tempCp, tempCp_hat, names_Cp, coeff_Cp, intercept_Cp);
+
+figure('Name','Cp(J)')
+ax = gca;
+set(ax, 'FontSize', 14, 'LineWidth', 1.2);
+set(ax, 'TickLabelInterpreter', 'latex');
+hold on;
+scatter(J, Cp, 10, 'k', 'filled');
+scatter(J(J <= 0.7), Cp_hat(J <= 0.7), 4, 'r', 'filled');
+hold off;
+xlabel('$J$', 'FontSize', 14, 'Interpreter', 'latex');
+ylabel('$C_P$', 'FontSize', 16, 'Interpreter', 'latex');
+ylim([0 0.04])
+h = legend('BEM $C_P$', 'Predicted $C_P$');
+set(h, 'Interpreter', 'latex');
+set(h, 'FontSize', 13)
+legend boxoff;
+box on;
+
+% Find the minimums/maximums of fitted Cp(J)
+% dCp_dJ = coeff_Cp(1)*ones(length(J),1) + 2*coeff_Cp(2)*J + 3*coeff_Cp(3)*J.^2;
+J_roots = roots([3*coeff_Cp(3) 2*coeff_Cp(2) coeff_Cp(1)]);
+fprintf('\nJ_root1 = %.2e\nJ_root2 = %.2e\n', J_roots(1), J_roots(2));
 
 %%
 datarange = J>0.2 & ~isnan(power);
@@ -47,8 +88,8 @@ Va_hat = X_Va(datarange,:) * coeff_Va + intercept_Va;
 J_hat = X_J(datarange,:) * coeff_J + intercept_J;
 Va_hat2 = J_hat .* (rpm(datarange)/60) * (10*0.0254);
 
-dispModelInfo(airspeed(datarange), Va_hat, names_Va, coeff_Va);
-dispModelInfo(airspeed(datarange), Va_hat2, names_J, coeff_J);
+dispModelInfo(airspeed(datarange), Va_hat, names_Va, coeff_Va, intercept_Va);
+dispModelInfo(airspeed(datarange), Va_hat2, names_J, coeff_J, intercept_J);
 
 figure;
 plot(t(datarange), airspeed(datarange), 'k', 'LineWidth', 1.5); hold on;
@@ -82,12 +123,19 @@ for c = 1:1:100 % iterate over all rpm values (columns)
 end
 
 figure('Name','Va(P), w=const')
+ax = gca;
+set(ax, 'FontSize', 14, 'LineWidth', 1.2);
+set(ax, 'TickLabelInterpreter', 'latex');
 hold on;
 for i = 10:10:100
-    plot(P(:,i), Va, '-', Color='k', LineWidth=1.2);
-    plot(P(:,i), Va_constRPM_hat(:,i), '-', Color='r', LineWidth=1.2);
-    plot(P(:,i), Va_constRPM_hat2(:,i), '-', Color='g', LineWidth=1.2);
+    plot(P(:,i), Va, '-', Color='k', LineWidth=2);
+    plot(P(:,i), Va_constRPM_hat(:,i), '-', Color='r', LineWidth=1.5);
+    plot(P(:,i), Va_constRPM_hat2(:,i), '-', Color='g', LineWidth=1.5);
 end
 xlabel('$P$ (W)', 'FontSize', 14, 'Interpreter', 'latex');
-ylabel('$V_a$ ($\frac{m}{s}$)', 'FontSize', 14, 'Interpreter', 'latex');
-legend('BEM Airspeed', 'Predicted from Va(P,w) model', 'Predicted from Va(Cp) model');
+ylabel('$V_a$ ($\frac{m}{s}$)', 'FontSize', 16, 'Interpreter', 'latex');
+h = legend('BEM airspeed', 'Predicted airspeed with $V_a(P,\omega)$', 'Predicted airspeed with $V_a(C_P)$');
+set(h, 'Interpreter', 'latex');
+set(h, 'FontSize', 10)
+legend boxoff;
+box on;
