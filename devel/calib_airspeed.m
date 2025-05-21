@@ -15,6 +15,7 @@ function [calibrated_airspeed, VWN, VWE] = calib_airspeed(airspeed, Vnorth, Veas
     
     x = A \ b;
     
+    fprintf('Airspeed corr_factor = %.2f', x(1));
     calibrated_airspeed = x(1) * airspeed;
     VWN = x(2);
     VWE = x(3);
