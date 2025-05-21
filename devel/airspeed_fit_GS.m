@@ -85,7 +85,7 @@ Va_north_hat = X1(datarange,:) * coeff;
 Va_east_hat = X2(datarange,:) * coeff;
 Va_hat = sqrt(Va_north_hat.^2 + Va_east_hat.^2);
 
-dispModelInfo(airspeed(datarange), Va_hat, names, coeff(2:end));
+dispModelInfo(airspeed(datarange), Va_hat, names, coeff(2:end), intercept);
 
 %% visualization
 % figure;
