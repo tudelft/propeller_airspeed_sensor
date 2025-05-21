@@ -13,7 +13,7 @@ addpath('tools/');
 data_folder = "C:\MavLab\ESC_Feedback_Log\Pavel";
 
 % Data loading and selection
-sel = ["144","145","148"]; %Put the number code of the flight log you wish to use for analysis.
+sel = ["144","145","148","254","257","418"]; %Put the number code of the flight log you wish to use for analysis.
 ac_datalist = data_loader(sel, data_folder);
 
 

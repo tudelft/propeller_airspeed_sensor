@@ -13,7 +13,7 @@ addpath('tools/');
 data_folder = "C:\MavLab\ESC_Feedback_Log\Pavel";
 
 % Data loading and selection
-sel = ["144","145","148","254"]; %Put the number code of the flight log you wish to use for analysis.
+sel = ["144","145","148","254","257","418"]; %Put the number code of the flight log you wish to use for analysis.
 ac_datalist = data_loader(sel, data_folder);
 
 
@@ -26,7 +26,7 @@ ac_s_datalist = data_selector(ac_datalist,v);
 OJF_data = OJF_data_loader(data_folder);
 ac_s_datalist.OJFac_data = OJF_data; 
 %% Data Merging 
-set_num = 3; %Number of test sets
+set_num = 2; %Number of test sets
 %t_list = {"ac_data144", "ac_data145"};
 [train_data,test_data] = data_merger(ac_s_datalist,set_num); 
 % works to combine the training set into one large set
@@ -37,7 +37,7 @@ set_num = 3; %Number of test sets
 %How many data sets are used for training
 %Order of RPM,Power,RPM rate
 rpm_order = [1,2];
-power_order = [-2,1,2];
+power_order = [-1,-2,1,2];
 rpmrate_order = [1,2];
 mdl = linear_model_fitter(train_data,rpm_order,power_order,rpmrate_order);
 

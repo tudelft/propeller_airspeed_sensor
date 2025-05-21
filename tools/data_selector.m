@@ -47,7 +47,8 @@ function data_list = data_selector(ac_datalist,v_a_select)
         fprintf("Airspeed after first correction %5.3f \n",airspeedfilt_data(300))
         % Velocity Correction #2 Due to the airspeed offset at the starting
         %condition.)
-        index = (find(radio_control>-1 & airspeedfilt_data>v_a_select & rpmfilt_data>1000)-1);
+        J = airspeedfilt_data./(8*0.0254*rpmfilt_data/60); 
+        index = (find(radio_control>-1 & airspeedfilt_data>v_a_select & rpmfilt_data>5000 & J>0.25))-1;
         %airspeedfilt_data = gps_offset_correction(ac_data,airspeedfilt_data,index,timestamp);
 
         %Cutting Block
