@@ -1,5 +1,5 @@
 clear;
-% close all;
+close all;
 
 %% user input
 THETA_SELECTION = false;
@@ -21,7 +21,7 @@ t = (t(1):1/fs:t(end))';
 gyro_p = interp1(ac_data.IMU_GYRO_SCALED.timestamp, ...
                  ac_data.IMU_GYRO_SCALED.gp_alt, t, 'linear', 'extrap')*pi/180;
 
-airspeed = corr_factor*interp1(ac_data.AIR_DATA.timestamp, ...
+airspeed = interp1(ac_data.AIR_DATA.timestamp, ...
                                ac_data.AIR_DATA.airspeed, t, 'linear', 'extrap');
 airspeed = airspeed - gyro_p*0.24;
 
@@ -34,7 +34,10 @@ voltage = interp1(double(ac_data.SERIAL_ACT_T4_IN.timestamp), ...
 power = voltage.*current;
 theta = interp1(ac_data.EULER.timestamp, ac_data.EULER.theta, t, 'linear', 'extrap');
 
-%% filter with Butterworth before fitting
+%% calibrate airspeed
+airspeed = corr_factor * airspeed;
+
+%% filter with Butterworth
 filter_freq = 2;
 [b, a] = butter(2,filter_freq/(fs/2));
 

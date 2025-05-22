@@ -2,11 +2,11 @@ clear;
 close all;
 
 %% user input
-load('/home/ntouev/MATLAB/propeller_airspeed_sensor/post_data/flight/144.mat')
-tranges = [250 326];
+THETA_SELECTION = false;
+p_model_structure = 'bem_reduced_wdot';
 
-% load('/home/ntouev/MATLAB/propeller_airspeed_sensor/post_data/flight/0254-0257.mat')
-% tranges = [850 900];
+load('/home/ntouev/MATLAB/propeller_airspeed_sensor/post_data/flight/0254.mat')
+tranges = [846 908];
 
 %%
 t = ac_data.AIR_DATA.timestamp;
@@ -36,9 +36,10 @@ Vnorth = interp1(ac_data.ROTORCRAFT_FP.timestamp, ac_data.ROTORCRAFT_FP.vnorth_a
 Veast = interp1(ac_data.ROTORCRAFT_FP.timestamp, ac_data.ROTORCRAFT_FP.veast_alt, t, 'linear', 'extrap');
 
 %% calibrate airspeed
-[airspeed, VWN, VWE] = calib_airspeed(airspeed, Vnorth, Veast, psi, t, tranges);
+[corr_factor, VWN, VWE] = calib_airspeed(airspeed, Vnorth, Veast, psi, t, tranges);
+airspeed = corr_factor * airspeed;
 
-%% filter with Butterworth before fitting
+%% filter with Butterworth
 filter_freq = 5;
 [b, a] = butter(2,filter_freq/(fs/2));
 
@@ -62,21 +63,28 @@ for i = 1:size(tranges,1)
 end
 datarange = logical(datarange);
 
-datarange = datarange & airspeed>5 & power>10 & (theta<-70 & theta>-110); 
+if THETA_SELECTION
+    % probably better to use theta rate here, theta limits are not symmetrical either
+    datarange = datarange & airspeed>5 & power>10 & (theta<-70 & theta>-110);
+else
+    datarange = datarange & airspeed>5 & power>10;
+end
+
 datarange = datarange & J>0.3;
 
 %% Fit
 Y1 = Vnorth - VWN; 
 Y2 = Veast - VWE;
 
-[X, names] = model_structure_Pw(power, rpm, rpm_dot, 'bem_reduced_wdot');
+[X, names] = model_structure_Pw(power, rpm, rpm_dot, p_model_structure);
 X1 = [ones(length(t),1) X] .* cos(psi);
 X2 = [ones(length(t),1) X] .* sin(psi);
 
 % not the proper way. Normally we d like to fit without an intercept.
-% However X needs to be standardized and lasso handles that perfectly so
-% keep an eye on intercept, as long as it is small it is ok.
-[B, FitInfo] = lasso([X1(datarange,:); X2(datarange,:)], [Y1(datarange); Y2(datarange)], 'Lambda', 1e-10);
+% However X needs to be standardized and lasso handles that nicely so
+% keep an eye on the intercept, as long as it is small it is ok.
+[B, FitInfo] = lasso([X1(datarange,:); X2(datarange,:)], [Y1(datarange); Y2(datarange)], ...
+                     'Lambda', 1e-10);
 intercept = FitInfo.Intercept;
 coeff = B;
 
@@ -87,19 +95,32 @@ Va_hat = sqrt(Va_north_hat.^2 + Va_east_hat.^2);
 
 dispModelInfo(airspeed(datarange), Va_hat, names, coeff(2:end), intercept);
 
-%% visualization
-% figure;
-% hold on;
-% plot(t(datarange), Y1(datarange), 'k.');
-% plot(t(datarange), Vnorth_hat, 'r.');
-% hold off;
-% grid on;
+%% visualize the regular fit in the same plot
+% first run airspeed fit
+% then the run 
+% Va_hat_fit = Va_hat;
+% and 
+% t_fit = t(datarange);
+% the run airspeed_fit_GS WITHOUT CLEARING THE WORKSPACE
 
+%% visualization
 figure('Name','Airspeed fit with Ground Speed data');
+ax = gca;
+set(ax, 'FontSize', 14, 'LineWidth', 1.2);
+set(ax, 'TickLabelInterpreter', 'latex');
 hold on;
-plot(t(datarange), airspeed(datarange), 'k.');
-plot(t(datarange), Va_hat, 'r.');
-xlabel('t [sec]');
-ylabel('Va [m/s]');
-hold off;
-grid on;
+plot(t(datarange), airspeed(datarange), 'k-',  LineWidth=2);
+plot(t_fit, Va_hat_fit, 'r-',  LineWidth=1.5);
+plot(t(datarange), Va_hat, 'g-',  LineWidth=1.5);
+xlabel('$t$ [s]', 'FontSize', 14, 'Interpreter', 'latex');
+ylabel('$V_a$ [m/s]', 'FontSize', 14, 'Interpreter', 'latex');
+% h = legend('Pitot', ...
+%            '$\beta_0 + \beta_1 \omega + \beta_2 \frac{P^2}{\omega^5} + \beta_3 \omega \dot{\omega} $');
+h = legend('Pitot', ...
+           'Fit using Airspeed', ...
+           'Fit using Ground speed');
+set(h, 'Interpreter', 'latex');
+set(h, 'FontSize', 11)
+legend boxoff;
+box on;
+axis padded
