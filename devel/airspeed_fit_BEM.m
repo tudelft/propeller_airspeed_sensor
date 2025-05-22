@@ -1,19 +1,21 @@
-% clear; 
+clear; 
 close all;
-
-%%
-% addpath('/home/ntouev/MATLAB/propeller_airspeed_sensor/tools/');
 
 %% user input
 load('/home/ntouev/MATLAB/propeller_airspeed_sensor/post_data/BEM/BEM_t.mat')
+p_model_structure = 'bem_reduced';
+Cp_model_structure = 'bem_reduced';
+
+D = 10*0.0254;
+
 LASSO_EXPLORE = false;
 idx_Va = 55;
 idx_J = 30;
 
 %%
 t = 1:1:10000;
-J = airspeed./((rpm/60)*(10*0.0254));
-Cp = power./(1.225*(10*0.0254)^5*(rpm/60).^3);
+J = airspeed./((rpm/60)*D);
+Cp = power./(1.225*D^5*(rpm/60).^3);
 
 %%
 datarange = J>0.2 & ~isnan(power);
@@ -33,10 +35,10 @@ if LASSO_EXPLORE
     intercept_J = FitInfo_J.Intercept(idx_J);
     coeff_J = B_J(:, idx_J);
 else
-    [X_Va, names_Va] = model_structure_Pw(power, rpm, [], 'bem_reduced');
+    [X_Va, names_Va] = model_structure_Pw(power, rpm, [], p_model_structure);
     [B_Va, FitInfo_Va] = lasso(X_Va(datarange,:), airspeed(datarange), 'Lambda', 1e-10);
     
-    [X_J, names_J] = model_structure_Cp(Cp, 'bem_reduced'); 
+    [X_J, names_J] = model_structure_Cp(Cp, Cp_model_structure); 
     [B_J, FitInfo_J] = lasso(X_J(datarange,:), J(datarange), 'Lambda', 1e-10);
 
     intercept_Va = FitInfo_Va.Intercept;
@@ -48,19 +50,22 @@ end
 %% Predict timeseries
 Va_hat = X_Va(datarange,:) * coeff_Va + intercept_Va;
 J_hat = X_J(datarange,:) * coeff_J + intercept_J;
-Va_hat2 = J_hat .* (rpm(datarange)/60) * (10*0.0254);
+Va_hat2 = J_hat .* (rpm(datarange)/60) * D;
 
 dispModelInfo(airspeed(datarange), Va_hat, names_Va, coeff_Va, intercept_Va);
 dispModelInfo(airspeed(datarange), Va_hat2, names_J, coeff_J, intercept_J);
 
-figure;
-plot(t(datarange), airspeed(datarange), 'k', 'LineWidth', 2); hold on;
-plot(t(datarange), Va_hat, 'r', 'LineWidth', 1.5);
-plot(t(datarange), Va_hat2, 'g', 'LineWidth', 1.5);
-legend('BEM Airspeed', 'Predicted from Va(P,w) model', 'Predicted from J(Cp) model');
-xlabel('Sample Index');
-ylabel('Airspeed');
-grid on;
+%% visualize timeseries
+% figure('Name','Va vs sample index');
+% hold on;
+% plot(t(datarange), airspeed(datarange), 'k', 'LineWidth', 2);
+% plot(t(datarange), Va_hat, 'r', 'LineWidth', 1.5);
+% plot(t(datarange), Va_hat2, 'g', 'LineWidth', 1.5);
+% hold off
+% legend('BEM', 'Va(P,w)', 'J(Cp)');
+% xlabel('Sample Index');
+% ylabel('Airspeed');
+% grid on;
 
 %% Predict Va(P, w_const) & visualization
 w = zeros(100,1);
@@ -79,7 +84,7 @@ for c = 1:1:100 % iterate over all rpm values (columns)
         end
 
         Va_constRPM_hat(r,c) = X_Va(100*(c-1)+r,:) * coeff_Va + intercept_Va;
-        Va_constRPM_hat2(r,c) = (X_J(100*(c-1)+r,:) * coeff_J + intercept_J) * (w(c)/60) * (10*0.0254);
+        Va_constRPM_hat2(r,c) = (X_J(100*(c-1)+r,:) * coeff_J + intercept_J) * (w(c)/60) * D;
     end
 end
 
@@ -94,9 +99,11 @@ for i = 10:10:100
     plot(P(:,i), Va_constRPM_hat2(:,i), '-', Color='g', LineWidth=1.5);
 end
 xlabel('$P$ [W]', 'FontSize', 14, 'Interpreter', 'latex');
-ylabel('$V_a$ [m/s]', 'FontSize', 16, 'Interpreter', 'latex');
-h = legend('BEM airspeed', 'Predicted airspeed with $V_a(P,\omega)$', 'Predicted airspeed with $V_a(C_P)$');
+ylabel('$V_a$ [m/s]', 'FontSize', 14, 'Interpreter', 'latex');
+h = legend('BEM', ...
+           '$\beta_0 + \beta_1 \omega + \beta_2 \frac{P^2}{\omega^5}$', ...
+           '$\alpha_0 + \alpha_1 C_P + \alpha_2 C_P^4$');
 set(h, 'Interpreter', 'latex');
-set(h, 'FontSize', 10)
+set(h, 'FontSize', 11)
 legend boxoff;
 box on;
