@@ -3,7 +3,7 @@ close all;
 
 %% user input
 WT = false;
-THETA_SELECTION = true; % N/A for wt data
+THETA_SELECTION = false; % N/A for wt data
 corr_factor = NaN;
 p_model_structure = 'bem_reduced_wdot';
 Cp_model_structure = 'bem_reduced';
@@ -12,9 +12,9 @@ T_COMPACT = false;
 % load('/home/ntouev/MATLAB/propeller_airspeed_sensor/post_data/flight/144.mat')
 % tranges = [250 326];
 
-% load('/home/ntouev/MATLAB/propeller_airspeed_sensor/post_data/flight/0254.mat')
+load('/home/ntouev/MATLAB/propeller_airspeed_sensor/post_data/flight/0254.mat')
 % tranges = [846 970]; % connected interval -> automatic airspeed calibration is possible
-% tranges = [846 908]; % removed second part
+tranges = [846 908]; % removed second part
 % tranges = [0 908.2; 932.7 970]; corr_factor = 0.85; % short
 % tranges = [0 859; 870 879; 889 938; 967 970]; corr_factor = 0.85; % shorter 
 
@@ -64,7 +64,7 @@ end
 airspeed = corr_factor * airspeed;
 fprintf("Airspeed corr_factor = %.2f", corr_factor);
 
-%% filter with Butterworth before fitting
+%% filter with Butterworth
 filter_freq = 5;
 [b, a] = butter(2,filter_freq/(fs/2));
 
@@ -90,7 +90,7 @@ datarange = logical(datarange);
 
 if ~WT
     if THETA_SELECTION
-        % probably better to use theta rate here
+        % probably better to use theta rate here, theta limits are not symmetrical either
         datarange = datarange & airspeed>5 & power>10 & (theta<-70 & theta>-110);
     else
         datarange = datarange & airspeed>5 & power>10;
