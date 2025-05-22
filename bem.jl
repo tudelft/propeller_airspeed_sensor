@@ -13,6 +13,7 @@ B = 2
 rotor = Rotor(Rhub, Rtip, B)
 
 # propeller geometry
+# r/R    c/R     angle (deg)
 propgeom = [
 0.15   0.130   32.76
 0.20   0.149   37.19
@@ -45,9 +46,11 @@ sections = Section.(r, chord, theta, Ref(af))
 # define the range of the input to the BEM algorithm (rpm,Va)
 nRPM = 100
 nVa = 100
-Va = range(0, 30, length=nVa)
+Va = range(0.1, 30, length=nVa)
 rpm = range(0, 10000, length=nRPM)
 P = zeros(nVa,nRPM)
+P2 = zeros(nVa,nRPM)
+
 # run the algorithm for the various operating points 
 for j = 1:nVa
     for i = 1:nRPM
@@ -57,6 +60,7 @@ for j = 1:nVa
         T, Q = thrusttorque(rotor, sections, outputs)
         eff, CT, CQ = nondim(T, Q, Va[j], Omega, rho, rotor, "propeller")
         P[j,i] = 2π*CQ * rho * (rpm[i]/60)^3 * (2Rtip)^5
+        P2[j,i] = Q*Omega
         if j == 1 && i == 90
             print(CQ)
             print(rpm[i])
@@ -72,6 +76,8 @@ plot!(Va,P[:,50], label="5000", linewidth=2)
 plot!(Va,P[:,70], label="7000", linewidth=2)
 plot!(Va,P[:,90], label="9000", linewidth=2)
 
+plot!(Va,P2[:,10], label="1000 P2", linewidth=2)
+
 # restructure the data in a (rpm,P,Va) format, using dataframes
 X = zeros(nRPM*nVa,2)
 Y = zeros(nRPM*nVa,1)
@@ -84,6 +90,14 @@ for i = 1:nRPM
 end
 data = DataFrame(rpm=vec(X[:,1]), power=vec(X[:,2]), va = vec(Y))
 
-# save as a .mat file
-data_dict = Dict("rpm" => data.rpm, "power" => data.power, "airspeed" => data.va)
-matwrite("BEM.mat", data_dict)
+# P as a function of t
+BEM_t_dict = Dict("rpm" => data.rpm, "power" => data.power, "airspeed" => data.va)
+matwrite("BEM_t.mat", BEM_t_dict)
+
+# # P as a function of Va and w
+# BEM_dict = Dict(
+#     "w" => collect(rpm),
+#     "Va" => collect(Va),
+#     "P" => P
+# )
+# matwrite("BEM.mat", BEM_dict)
