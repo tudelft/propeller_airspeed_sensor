@@ -1,4 +1,4 @@
-function [calibrated_airspeed, VWN, VWE] = calib_airspeed(airspeed, Vnorth, Veast, psi, t, tranges)
+function [corr_factor, VWN, VWE] = calib_airspeed(airspeed, Vnorth, Veast, psi, t, tranges)
 
     datarange = zeros(length(t),1);
     for i = 1:size(tranges,1)
@@ -15,8 +15,7 @@ function [calibrated_airspeed, VWN, VWE] = calib_airspeed(airspeed, Vnorth, Veas
     
     x = A \ b;
     
-    fprintf('Airspeed corr_factor = %.2f', x(1));
-    calibrated_airspeed = x(1) * airspeed;
+    corr_factor = x(1);
     VWN = x(2);
     VWE = x(3);
 end
