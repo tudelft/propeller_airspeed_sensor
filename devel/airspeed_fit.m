@@ -3,25 +3,25 @@ close all;
 
 %% user input
 WT = false;
+THETA_SELECTION = true; % N/A for wt data
+corr_factor = NaN;
+p_model_structure = 'bem_reduced_wdot';
+Cp_model_structure = 'bem_reduced';
+T_COMPACT = false;
 
-% load('/home/ntouev/MATLAB/propeller_airspeed_sensor/post_data/flight/144-145-148.mat')
-% tranges = [250 326]; % 144
-% tranges = [918 1051; 1051.1 1163; 1363 1486];
-% tranges = [250 326; 497 517; 918 1051; 1051.1 1163; 1363 1486];
+% load('/home/ntouev/MATLAB/propeller_airspeed_sensor/post_data/flight/144.mat')
+% tranges = [250 326];
 
-load('/home/ntouev/MATLAB/propeller_airspeed_sensor/post_data/flight/0254-0257.mat')
-% tranges = [0 1600]; % whole (0254 - 0257)
-tranges = [0 970]; % 0254
-% tranges = [0 859; 870 879; 889 938; 967 970]; % 0254
-% tranges = [1430 1443; 1554 1566; 1585 1598]; % 0257
-% tranges = [840 980; 1430 1443; 1554 1566; 1585 1598];
-
-% load('/home/ntouev/MATLAB/propeller_airspeed_sensor/post_data/flight/0418.mat')
-% tranges = [545 600; 650 670; 693 725];
+% load('/home/ntouev/MATLAB/propeller_airspeed_sensor/post_data/flight/0254.mat')
+% tranges = [846 970]; % connected interval -> automatic airspeed calibration is possible
+% tranges = [846 908]; % removed second part
+% tranges = [0 908.2; 932.7 970]; corr_factor = 0.85; % short
+% tranges = [0 859; 870 879; 889 938; 967 970]; corr_factor = 0.85; % shorter 
 
 % load('/home/ntouev/MATLAB/propeller_airspeed_sensor/post_data/wt/whole_1motor_3angles.mat')
-% tranges = [0 1316]; % angle == 0
-% WT = true;
+% tranges = [0 1316]; WT = true; corr_factor = 1; % angle == 0
+
+D = 10*0.0254;
 
 LASSO_EXPLORE = false;
 idx_Va = 72;
@@ -58,7 +58,11 @@ else
 end
 
 %% calibrate airspeed
-[airspeed, VWN, VWE] = calib_airspeed(airspeed, Vnorth, Veast, psi, t, tranges);
+if ~WT & isnan(corr_factor) 
+    [corr_factor, VWN, VWE] = calib_airspeed(airspeed, Vnorth, Veast, psi, t, tranges);
+end
+airspeed = corr_factor * airspeed;
+fprintf("Airspeed corr_factor = %.2f", corr_factor);
 
 %% filter with Butterworth before fitting
 filter_freq = 5;
@@ -69,8 +73,8 @@ rpm = filtfilt(b,a,rpm);
 power= filtfilt(b,a,power);
 
 %%
-J = airspeed./((rpm/60)*(10*0.0254));
-Cp = power./(1.225*(10*0.0254)^5*(rpm/60).^3);
+J = airspeed./((rpm/60)*D);
+Cp = power./(1.225*D^5*(rpm/60).^3);
 
 %% derivatives
 rpm_dot = [zeros(1,1); diff(rpm,1)]*fs;
@@ -85,10 +89,16 @@ end
 datarange = logical(datarange);
 
 if ~WT
-    datarange = datarange & airspeed>5 & power>10 & (theta<-70 & theta>-110); 
+    if THETA_SELECTION
+        % probably better to use theta rate here
+        datarange = datarange & airspeed>5 & power>10 & (theta<-70 & theta>-110);
+    else
+        datarange = datarange & airspeed>5 & power>10;
+    end
 else
     datarange = datarange & power>40 & rpm_dot<200 & rpm_dot>-200;
 end
+
 datarange = datarange & J>0.3;
 
 %% Fit
@@ -107,10 +117,10 @@ if LASSO_EXPLORE
     intercept_J = FitInfo_J.Intercept(idx_J);
     coeff_J = B_J(:, idx_J);
 else
-    [X_Va, names_Va] = model_structure_Pw(power, rpm, rpm_dot, 'bem_reduced_wdot');
+    [X_Va, names_Va] = model_structure_Pw(power, rpm, rpm_dot, p_model_structure);
     [B_Va, FitInfo_Va] = lasso(X_Va(datarange,:), airspeed(datarange), 'Lambda', 1e-10);
     
-    [X_J, names_J] = model_structure_Cp(Cp, 'bem_reduced');    
+    [X_J, names_J] = model_structure_Cp(Cp, Cp_model_structure);    
     [B_J, FitInfo_J] = lasso(X_J(datarange,:), J(datarange), 'Lambda', 1e-10); 
 
     intercept_Va = FitInfo_Va.Intercept;
@@ -122,16 +132,18 @@ end
 %% Predict
 Va_hat = X_Va(datarange,:) * coeff_Va + intercept_Va;
 J_hat = X_J(datarange,:) * coeff_J + intercept_J;
-Va_hat2 = J_hat .* (rpm(datarange)/60) * (10*0.0254);
+Va_hat2 = J_hat .* (rpm(datarange)/60) * D;
 
 dispModelInfo(airspeed(datarange), Va_hat, names_Va, coeff_Va, intercept_Va);
-dispModelInfo(airspeed(datarange), Va_hat2, names_J, coeff_J, intercept_J);
+% dispModelInfo(airspeed(datarange), Va_hat2, names_J, coeff_J, intercept_J);
 
 %% visualization
-
-% reindex t to make compact plots
-% t_compact = t(datarange);
-t_compact = 1:length(t(datarange));
+if T_COMPACT
+    t_compact = t(datarange);
+else
+    % not sure about this statement but seems to be working
+    t_compact = 1:length(t(datarange));
+end
 
 figure('Name','Va fit');
 ax = gca;
@@ -140,20 +152,55 @@ set(ax, 'TickLabelInterpreter', 'latex');
 hold on;
 scatter(t_compact, airspeed(datarange), 9, 'k', 'filled');
 scatter(t_compact, Va_hat, 3, 'r', 'filled');
-% scatter(t_compact, Va_hat2, 4, 'g', 'filled');
+% scatter(t_compact, Va_hat2, 3, 'g', 'filled');
+% plot(t_compact, airspeed(datarange), 'k-',  LineWidth=2);
+% plot(t_compact, Va_hat, 'r-',  LineWidth=1.5);
 hold off;
-xlabel('Sample index', 'FontSize', 14, 'Interpreter', 'latex');
-ylabel('$V_a$ [m/s]', 'FontSize', 16, 'Interpreter', 'latex');
-h = legend('Airspeed', 'Fitted airspeed with $V_a(P,\omega)$');
-% h = legend('Airspeed', 'Fitted airspeed with $V_a(P,\omega)$', 'Fitted airspeed with $V_a(C_P)$');
+xlabel('$t$ [s]', 'FontSize', 14, 'Interpreter', 'latex');
+ylabel('$V_a$ [m/s]', 'FontSize', 14, 'Interpreter', 'latex');
+h = legend('Pitot', ...
+           '$\beta_0 + \beta_1 \omega + \beta_2 \frac{P^2}{\omega^5} + \beta_3 \omega \dot{\omega} $');
+% h = legend('Wind tunnel', ...
+%            '$\beta_0 + \beta_1 \omega + \beta_2 \frac{P^2}{\omega^5}$', ...
+%            '$\alpha_0 + \alpha_1 C_P + \alpha_2 C_P^4$');
 set(h, 'Interpreter', 'latex');
-set(h, 'FontSize', 10)
+set(h, 'FontSize', 11)
 legend boxoff;
 box on;
 axis padded
 
+%% theta visualization
+% %this needs a lot of manual work to display the desired time ranges
+% figure('Name','Theta');
+% ax = gca;
+% set(ax, 'FontSize', 14, 'LineWidth', 1.2);
+% set(ax, 'TickLabelInterpreter', 'latex');
+% plot(t_compact, theta(datarange), 'k', LineWidth=1.5);
+% xlabel('$t$ [s]', 'FontSize', 14, 'Interpreter', 'latex');
+% ylabel('$\theta$ [deg]', 'FontSize', 14, 'Interpreter', 'latex');
+% set(h, 'Interpreter', 'latex');
+% set(h, 'FontSize', 11)
+% box on;
+% axis padded
+
 %% save the model
-% save('/home/ntouev/MATLAB/propeller_airspeed_sensor/models/144.mat', ...
-%      'names_Va', 'names_J', ...
-%      'coeff_Va', 'coeff_J', ...
-%      'intercept_Va', 'intercept_J');
+% save('/home/ntouev/MATLAB/propeller_airspeed_sensor/models/0254.mat', ...
+%      'names_Va', 'coeff_Va', 'intercept_Va');
+
+%% random stuff to be removed eventually
+% load('/home/ntouev/MATLAB/propeller_airspeed_sensor/post_data/flight/144-145-148.mat')
+% tranges = [918 1051; 1051.1 1163; 1363 1486];
+% tranges = [0 1600];
+% tranges = [250 326; 497 517; 918 1051; 1051.1 1163; 1363 1486];
+
+% load('/home/ntouev/MATLAB/propeller_airspeed_sensor/post_data/flight/0254-0257.mat')
+% tranges = [0 1600]; % whole (0254 - 0257)
+% tranges = [0 970]; % 0254
+% tranges = [0 859; 870 879; 889 938; 967 970]; % 0254 short
+% tranges = [1430 1443; 1554 1566; 1585 1598]; % 0257 short
+% tranges = [840 980; 1430 1443; 1554 1566; 1585 1598];
+
+% 0418 is not recommended. Flight was far from steady
+% load('/home/ntouev/MATLAB/propeller_airspeed_sensor/post_data/flight/0418.mat')
+% tranges = [0 1600];
+% tranges = [545 600; 650 670; 693 725];
