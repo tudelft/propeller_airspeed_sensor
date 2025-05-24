@@ -21,7 +21,7 @@ tranges = [846 908]; % removed second part
 % load('/home/ntouev/MATLAB/propeller_airspeed_sensor/post_data/wt/whole_1motor_3angles.mat')
 % tranges = [0 1316]; WT = true; corr_factor = 1; % angle == 0
 
-D = 10*0.0254;
+D = 8*0.0254;
 
 LASSO_EXPLORE = false;
 idx_Va = 72;
@@ -139,10 +139,10 @@ dispModelInfo(airspeed(datarange), Va_hat, names_Va, coeff_Va, intercept_Va);
 
 %% visualization
 if T_COMPACT
-    t_compact = t(datarange);
-else
     % not sure about this statement but seems to be working
     t_compact = 1:length(t(datarange));
+else
+    t_compact = t(datarange);
 end
 
 figure('Name','Va fit');
@@ -150,15 +150,17 @@ ax = gca;
 set(ax, 'FontSize', 14, 'LineWidth', 1.2);
 set(ax, 'TickLabelInterpreter', 'latex');
 hold on;
-scatter(t_compact, airspeed(datarange), 9, 'k', 'filled');
-scatter(t_compact, Va_hat, 3, 'r', 'filled');
+% scatter(t_compact, airspeed(datarange), 9, 'k', 'filled');
+% scatter(t_compact, Va_hat, 3, 'r', 'filled');
 % scatter(t_compact, Va_hat2, 3, 'g', 'filled');
-% plot(t_compact, airspeed(datarange), 'k-',  LineWidth=2);
-% plot(t_compact, Va_hat, 'r-',  LineWidth=1.5);
+plot(t_compact, airspeed(datarange), 'k-',  LineWidth=2);
+plot(t_compact, Va_hat, 'r-',  LineWidth=1.5);
+plot(t_compact, Va_hat2, 'g-',  LineWidth=1.5);
 hold off;
 xlabel('$t$ [s]', 'FontSize', 14, 'Interpreter', 'latex');
 ylabel('$V_a$ [m/s]', 'FontSize', 14, 'Interpreter', 'latex');
 h = legend('Pitot', ...
+           '$\beta_0 + \beta_1 \omega + \beta_2 \frac{P^2}{\omega^5} + \beta_3 \omega \dot{\omega} $', ...
            '$\beta_0 + \beta_1 \omega + \beta_2 \frac{P^2}{\omega^5} + \beta_3 \omega \dot{\omega} $');
 % h = legend('Wind tunnel', ...
 %            '$\beta_0 + \beta_1 \omega + \beta_2 \frac{P^2}{\omega^5}$', ...
