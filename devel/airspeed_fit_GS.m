@@ -5,6 +5,8 @@ close all;
 THETA_SELECTION = false;
 p_model_structure = 'bem_reduced_wdot';
 
+D = 8*0.0254;
+
 load('/home/ntouev/MATLAB/propeller_airspeed_sensor/post_data/flight/0254.mat')
 tranges = [846 908];
 
@@ -48,8 +50,7 @@ rpm = filtfilt(b,a,rpm);
 power= filtfilt(b,a,power);
 
 %%
-J = airspeed./((rpm/60)*(10*0.0254));
-Cp = power./(1.225*(10*0.0254)^5*(rpm/60).^3);
+J = airspeed./((rpm/60)*D);
 
 %% derivatives
 rpm_dot = [zeros(1,1); diff(rpm,1)]*fs;
@@ -110,7 +111,7 @@ set(ax, 'FontSize', 14, 'LineWidth', 1.2);
 set(ax, 'TickLabelInterpreter', 'latex');
 hold on;
 plot(t(datarange), airspeed(datarange), 'k-',  LineWidth=2);
-plot(t_fit, Va_hat_fit, 'r-',  LineWidth=1.5);
+% plot(t_fit, Va_hat_fit, 'r-',  LineWidth=1.5);
 plot(t(datarange), Va_hat, 'g-',  LineWidth=1.5);
 xlabel('$t$ [s]', 'FontSize', 14, 'Interpreter', 'latex');
 ylabel('$V_a$ [m/s]', 'FontSize', 14, 'Interpreter', 'latex');
