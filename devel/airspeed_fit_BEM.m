@@ -2,11 +2,11 @@ clear;
 close all;
 
 %% user input
-load('/home/ntouev/MATLAB/propeller_airspeed_sensor/post_data/BEM/BEM_t.mat')
+load('/home/ntouev/MATLAB/propeller_airspeed_sensor/post_data/BEM/BEM_t_APC9.5x5.mat')
 p_model_structure = 'bem_reduced';
 Cp_model_structure = 'bem_reduced';
 
-D = 10*0.0254;
+D = 7.8*0.0254; % 9.5 to match power and 7.8 (same dataset) to match Cp(J)
 
 LASSO_EXPLORE = false;
 idx_Va = 55;

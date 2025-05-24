@@ -6,7 +6,9 @@ THETA_SELECTION = false;
 p_model_structure = 'bem_reduced_wdot';
 
 load('/home/ntouev/MATLAB/propeller_airspeed_sensor/post_data/flight/144.mat')
-load('/home/ntouev/MATLAB/propeller_airspeed_sensor/models/0254.mat')
+load('/home/ntouev/MATLAB/propeller_airspeed_sensor/models/0254_D8.mat')
+
+D = 8*0.0254;
 
 % 144
 corr_factor = 0.94;
@@ -46,8 +48,7 @@ rpm = filtfilt(b,a,rpm);
 power= filtfilt(b,a,power);
 
 %%
-J = airspeed./((rpm/60)*(10*0.0254));
-Cp = power./(1.225*(10*0.0254)^5*(rpm/60).^3);
+J = airspeed./((rpm/60)*D);
 
 %% derivatives
 rpm_dot = [zeros(1,1); diff(rpm,1)]*fs;
