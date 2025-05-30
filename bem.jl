@@ -39,7 +39,7 @@ r = propgeom[:, 1] * Rtip
 chord = propgeom[:, 2] * Rtip
 theta = propgeom[:, 3] * pi/180
 
-af = AlphaAF("airfoils/naca4412.dat")
+af = AlphaAF("airfoils/clark_y_mod_10.4t_30.3c_5.8cam_43.9c.dat")
 
 sections = Section.(r, chord, theta, Ref(af))
 
