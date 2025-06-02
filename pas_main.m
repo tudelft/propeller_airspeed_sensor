@@ -13,7 +13,7 @@ addpath('tools/');
 data_folder = "C:\MavLab\ESC_Feedback_Log\Pavel";
 
 % Data loading and selection
-sel = ["144","145","148","254","257","418"]; %Put the number code of the flight log you wish to use for analysis.
+sel = ["144","145","148"]; %Put the number code of the flight log you wish to use for analysis.
 ac_datalist = data_loader(sel, data_folder);
 
 
@@ -37,8 +37,9 @@ set_num = 2; %Number of test sets
 %How many data sets are used for training
 %Order of RPM,Power,RPM rate
 rpm_order = [1,2];
-power_order = [-1,-2,1,2];
+power_order = [1,2];
 rpmrate_order = [1,2];
+
 mdl = linear_model_fitter(train_data,rpm_order,power_order,rpmrate_order);
 
 %% Model Save

@@ -13,9 +13,10 @@ function mdl = linear_model_fitter (train_data,rpm_order,power_order,rpmrate_ord
     for k = rpmrate_order
         input(1:length(ac_data.rpm),end+1) = ac_data.rpmrate.^k;
     end
-    input(1:length(ac_data.power),end+1) = ac_data.power .* ac_data.rpm;
+    input(1:length(ac_data.power),end+1) = ac_data.rpmrate .* ac_data.rpm;
     input(1:length(ac_data.dshot),end+1) = ac_data.dshot;
     input(1:length(ac_data.dshotrate),end+1) = ac_data.dshotrate;
+    %input(1:length(ac_data.power),end+1) = (ac_data.power.^2) ./ (ac_data.rpm.^5);
     
     output = ac_data.airspeed;
     mdl = fitlm(input, output, "linear", 'Intercept', true);
