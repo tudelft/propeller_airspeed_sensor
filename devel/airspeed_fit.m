@@ -11,15 +11,16 @@ T_COMPACT = false;
 
 % load('/home/ntouev/MATLAB/propeller_airspeed_sensor/post_data/flight/144.mat')
 % tranges = [250 326];
+% tranges = [247 334]; Jcrit = 0.23;
 
 load('/home/ntouev/MATLAB/propeller_airspeed_sensor/post_data/flight/0254.mat')
 % tranges = [846 970]; % connected interval -> automatic airspeed calibration is possible
-tranges = [846 908]; % removed second part
+tranges = [830 915]; Jcrit = 0.23; corr_factor = 0.92; 
 % tranges = [0 908.2; 932.7 970]; corr_factor = 0.85; % short
 % tranges = [0 859; 870 879; 889 938; 967 970]; corr_factor = 0.85; % shorter 
 
 % load('/home/ntouev/MATLAB/propeller_airspeed_sensor/post_data/wt/whole_1motor_3angles.mat')
-% tranges = [0 1316]; WT = true; corr_factor = 1; % angle == 0
+% tranges = [0 1316]; WT = true; Jcrit = 0.22; p_model_structure = 'bem_reduced'; corr_factor = 1; T_COMPACT=true; % angle == 0
 
 D = 8*0.0254;
 
@@ -93,13 +94,13 @@ if ~WT
         % probably better to use theta rate here, theta limits are not symmetrical either
         datarange = datarange & airspeed>5 & power>10 & (theta<-70 & theta>-110);
     else
-        datarange = datarange & airspeed>5 & power>10;
+        % datarange = datarange & power>10;
     end
 else
-    datarange = datarange & power>40 & rpm_dot<200 & rpm_dot>-200;
+    datarange = datarange & power>30 & rpm_dot<400 & rpm_dot>-400 & rpm<10000;
 end
 
-datarange = datarange & J>0.3;
+datarange = datarange & J>Jcrit;
 
 %% Fit
 if LASSO_EXPLORE
@@ -119,7 +120,7 @@ if LASSO_EXPLORE
 else
     [X_Va, names_Va] = model_structure_Pw(power, rpm, rpm_dot, p_model_structure);
     [B_Va, FitInfo_Va] = lasso(X_Va(datarange,:), airspeed(datarange), 'Lambda', 1e-10);
-    
+
     [X_J, names_J] = model_structure_Cp(Cp, Cp_model_structure);    
     [B_J, FitInfo_J] = lasso(X_J(datarange,:), J(datarange), 'Lambda', 1e-10); 
 
@@ -153,18 +154,17 @@ hold on;
 % scatter(t_compact, airspeed(datarange), 9, 'k', 'filled');
 % scatter(t_compact, Va_hat, 3, 'r', 'filled');
 % scatter(t_compact, Va_hat2, 3, 'g', 'filled');
-plot(t_compact, airspeed(datarange), 'k-',  LineWidth=2);
-plot(t_compact, Va_hat, 'r-',  LineWidth=1.5);
-plot(t_compact, Va_hat2, 'g-',  LineWidth=1.5);
+plot(t_compact, airspeed(datarange), 'k-',  LineWidth=1.5);
+plot(t_compact, Va_hat, 'r-',  LineWidth=1);
+% plot(t_compact, Va_hat2, 'g-',  LineWidth=1.5);
 hold off;
 xlabel('$t$ [s]', 'FontSize', 14, 'Interpreter', 'latex');
 ylabel('$V_a$ [m/s]', 'FontSize', 14, 'Interpreter', 'latex');
 h = legend('Pitot', ...
-           '$\beta_0 + \beta_1 \omega + \beta_2 \frac{P^2}{\omega^5} + \beta_3 \omega \dot{\omega} $', ...
            '$\beta_0 + \beta_1 \omega + \beta_2 \frac{P^2}{\omega^5} + \beta_3 \omega \dot{\omega} $');
 % h = legend('Wind tunnel', ...
 %            '$\beta_0 + \beta_1 \omega + \beta_2 \frac{P^2}{\omega^5}$', ...
-%            '$\alpha_0 + \alpha_1 C_P + \alpha_2 C_P^4$');
+%            '$\frac{\omega}{2\pi}(\alpha_0 + \alpha_1 C_P + \alpha_2 C_P^4)$');
 set(h, 'Interpreter', 'latex');
 set(h, 'FontSize', 11)
 legend boxoff;
@@ -172,7 +172,7 @@ box on;
 axis padded
 
 %% theta visualization
-% %this needs a lot of manual work to display the desired time ranges
+% % this needs a lot of manual work to display the desired time ranges
 % figure('Name','Theta');
 % ax = gca;
 % set(ax, 'FontSize', 14, 'LineWidth', 1.2);

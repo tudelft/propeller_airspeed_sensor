@@ -1,14 +1,15 @@
-clear;
+% clear;
 close all;
 
 %% user input
 THETA_SELECTION = false;
-p_model_structure = 'bem_reduced_wdot';
+p_model_structure = 'bem_reduced';
 
 D = 8*0.0254;
 
 load('/home/ntouev/MATLAB/propeller_airspeed_sensor/post_data/flight/0254.mat')
-tranges = [846 908];
+% tranges = [846 908];
+tranges = [830 915]; Jcrit = 0.23; corr_factor = 0.92; 
 
 %%
 t = ac_data.AIR_DATA.timestamp;
@@ -38,7 +39,7 @@ Vnorth = interp1(ac_data.ROTORCRAFT_FP.timestamp, ac_data.ROTORCRAFT_FP.vnorth_a
 Veast = interp1(ac_data.ROTORCRAFT_FP.timestamp, ac_data.ROTORCRAFT_FP.veast_alt, t, 'linear', 'extrap');
 
 %% calibrate airspeed
-[corr_factor, VWN, VWE] = calib_airspeed(airspeed, Vnorth, Veast, psi, t, tranges);
+[~, VWN, VWE] = calib_airspeed(airspeed, Vnorth, Veast, psi, t, tranges);
 airspeed = corr_factor * airspeed;
 
 %% filter with Butterworth
@@ -47,7 +48,11 @@ filter_freq = 5;
 
 airspeed = filtfilt(b,a,airspeed);
 rpm = filtfilt(b,a,rpm);
-power= filtfilt(b,a,power);
+power = filtfilt(b,a,power);
+theta = filtfilt(b,a,theta);
+psi = filtfilt(b,a,psi);
+Vnorth = filtfilt(b,a,Vnorth);
+Veast = filtfilt(b,a,Veast);
 
 %%
 J = airspeed./((rpm/60)*D);
@@ -68,18 +73,20 @@ if THETA_SELECTION
     % probably better to use theta rate here, theta limits are not symmetrical either
     datarange = datarange & airspeed>5 & power>10 & (theta<-70 & theta>-110);
 else
-    datarange = datarange & airspeed>5 & power>10;
+    % datarange = datarange & airspeed>5 & power>10;
 end
 
-datarange = datarange & J>0.3;
+datarange = datarange & J>Jcrit;
 
 %% Fit
 Y1 = Vnorth - VWN; 
 Y2 = Veast - VWE;
 
 [X, names] = model_structure_Pw(power, rpm, rpm_dot, p_model_structure);
-X1 = [ones(length(t),1) X] .* cos(psi);
-X2 = [ones(length(t),1) X] .* sin(psi);
+% X1 = [ones(length(t),1) X] .* cos(psi);
+% X2 = [ones(length(t),1) X] .* sin(psi);
+X1 = X .* cos(psi);
+X2 = X .* sin(psi);
 
 % not the proper way. Normally we d like to fit without an intercept.
 % However X needs to be standardized and lasso handles that nicely so
@@ -94,7 +101,7 @@ Va_north_hat = X1(datarange,:) * coeff;
 Va_east_hat = X2(datarange,:) * coeff;
 Va_hat = sqrt(Va_north_hat.^2 + Va_east_hat.^2);
 
-dispModelInfo(airspeed(datarange), Va_hat, names, coeff(2:end), intercept);
+dispModelInfo(airspeed(datarange), Va_hat, names, coeff, 99999);
 
 %% visualize the regular fit in the same plot
 % first run airspeed fit
@@ -102,7 +109,7 @@ dispModelInfo(airspeed(datarange), Va_hat, names, coeff(2:end), intercept);
 % Va_hat_fit = Va_hat;
 % and 
 % t_fit = t(datarange);
-% the run airspeed_fit_GS WITHOUT CLEARING THE WORKSPACE
+% then run airspeed_fit_GS WITHOUT CLEARING THE WORKSPACE
 
 %% visualization
 figure('Name','Airspeed fit with Ground Speed data');
@@ -110,9 +117,9 @@ ax = gca;
 set(ax, 'FontSize', 14, 'LineWidth', 1.2);
 set(ax, 'TickLabelInterpreter', 'latex');
 hold on;
-plot(t(datarange), airspeed(datarange), 'k-',  LineWidth=2);
-% plot(t_fit, Va_hat_fit, 'r-',  LineWidth=1.5);
-plot(t(datarange), Va_hat, 'g-',  LineWidth=1.5);
+plot(t(datarange), airspeed(datarange), 'k-',  LineWidth=1.5);
+% plot(t_fit, Va_hat_fit, 'r-',  LineWidth=1);
+plot(t(datarange), Va_hat, 'g-',  LineWidth=1);
 xlabel('$t$ [s]', 'FontSize', 14, 'Interpreter', 'latex');
 ylabel('$V_a$ [m/s]', 'FontSize', 14, 'Interpreter', 'latex');
 % h = legend('Pitot', ...
@@ -125,3 +132,7 @@ set(h, 'FontSize', 11)
 legend boxoff;
 box on;
 axis padded
+
+%% save the model
+save('/home/ntouev/MATLAB/propeller_airspeed_sensor/models/0254_GS.mat', ...
+     'names_Va', 'coeff_Va', 'intercept_Va');

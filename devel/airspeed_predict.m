@@ -6,13 +6,15 @@ THETA_SELECTION = false;
 p_model_structure = 'bem_reduced_wdot';
 
 load('/home/ntouev/MATLAB/propeller_airspeed_sensor/post_data/flight/144.mat')
-load('/home/ntouev/MATLAB/propeller_airspeed_sensor/models/0254_D8.mat')
+load('/home/ntouev/MATLAB/propeller_airspeed_sensor/models/0254_GS.mat')
+Jcrit = 0.23;
 
 D = 8*0.0254;
 
 % 144
-corr_factor = 0.94;
-tranges = [250 326];
+% corr_factor = 0.94;
+corr_factor = 1.04;
+tranges = [247 334];
 
 %%
 t = ac_data.AIR_DATA.timestamp;
@@ -40,7 +42,7 @@ theta = interp1(ac_data.EULER.timestamp, ac_data.EULER.theta, t, 'linear', 'extr
 airspeed = corr_factor * airspeed;
 
 %% filter with Butterworth
-filter_freq = 2;
+filter_freq = 3;
 [b, a] = butter(2,filter_freq/(fs/2));
 
 airspeed = filtfilt(b,a,airspeed);
@@ -66,10 +68,10 @@ if THETA_SELECTION
     % probably better to use theta rate here, theta limits are not symmetrical either
     datarange = datarange & airspeed>5 & power>10 & (theta<-70 & theta>-110);
 else
-    datarange = datarange & airspeed>5 & power>10;
+    % datarange = datarange & airspeed>5 & power>10;
 end
 
-datarange = datarange & J>0.3;
+datarange = datarange & J>Jcrit;
 
 %%
 [X_Va, names_Va] = model_structure_Pw(power, rpm, rpm_dot, p_model_structure);
