@@ -2,11 +2,12 @@ clear;
 close all;
 
 %% user input
-load('/home/ntouev/MATLAB/propeller_airspeed_sensor/post_data/BEM/BEM_t_APC9.5x5.mat')
+load('/home/ntouev/MATLAB/propeller_airspeed_sensor/post_data/BEM/BEM_t.mat')
 p_model_structure = 'bem_reduced';
 Cp_model_structure = 'bem_reduced';
+Jcrit = 0.24;
 
-D = 7.8*0.0254; % 9.5 to match power and 7.8 (same dataset) to match Cp(J)
+D = 8*0.0254; % 9.5 to match power and 7.8 (same dataset) to match Cp(J)
 
 LASSO_EXPLORE = false;
 idx_Va = 55;
@@ -18,7 +19,7 @@ J = airspeed./((rpm/60)*D);
 Cp = power./(1.225*D^5*(rpm/60).^3);
 
 %%
-datarange = J>0.2 & ~isnan(power);
+datarange = J>Jcrit & ~isnan(power);
 
 %% Fit
 if LASSO_EXPLORE
@@ -94,15 +95,17 @@ set(ax, 'FontSize', 14, 'LineWidth', 1.2);
 set(ax, 'TickLabelInterpreter', 'latex');
 hold on;
 for i = 10:10:100
+% for i = [30, 50, 70, 80, 90, 100]
     plot(P(:,i), Va, '-', Color='k', LineWidth=2);
-    plot(P(:,i), Va_constRPM_hat(:,i), '-', Color='r', LineWidth=1.5);
-    plot(P(:,i), Va_constRPM_hat2(:,i), '-', Color='g', LineWidth=1.5);
+    plot(P(:,i), Va_constRPM_hat(:,i), '--', Color='k', LineWidth=1.5);
+    plot(P(:,i), Va_constRPM_hat2(:,i), ':', Color='k', LineWidth=1.5);
 end
 xlabel('$P$ [W]', 'FontSize', 14, 'Interpreter', 'latex');
 ylabel('$V_a$ [m/s]', 'FontSize', 14, 'Interpreter', 'latex');
+ylim([0,30]);
 h = legend('BEM', ...
            '$\beta_0 + \beta_1 \omega + \beta_2 \frac{P^2}{\omega^5}$', ...
-           '$\alpha_0 + \alpha_1 C_P + \alpha_2 C_P^4$');
+           '$\frac{\omega}{2\pi}(\alpha_0 + \alpha_1 C_P + \alpha_2 C_P^4)$');
 set(h, 'Interpreter', 'latex');
 set(h, 'FontSize', 11)
 legend boxoff;

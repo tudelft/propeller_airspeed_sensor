@@ -1,36 +1,16 @@
-[airspeed_unique, ~] = unique(airspeed);
-[rpm_unique, ~] = unique(rpm);
-[rpm_grid, airspeed_grid] = meshgrid(rpm_unique, airspeed_unique);
-Cp_grid = griddata(rpm, airspeed, Cp, rpm_grid, airspeed_grid, 'linear');
-
-figure;
-surf(airspeed_grid, rpm_grid, Cp_grid, 'EdgeColor', 'none');
-xlabel('Airspeed (m/s)');
-ylabel('RPM');
-zlabel('Cp');
-title('Cp as a function of Airspeed and RPM');
-colormap winter;
-colorbar;
-
-[pCp_airspeed, pCp_rpm] = gradient(Cp_grid);
-gradient_magn = sqrt(pCp_rpm.^2 + pCp_airspeed.^2);
-% pcolor(airspeed_grid, rpm_grid, gradient_magn);
-% quiver(airspeed_grid, rpm_grid, pCp_airspeed, pCp_rpm, 'LineWidth', 1);
-
-hold on;
-
-mask = gradient_magn < 0.00003;
-x_black = airspeed_grid(mask);
-y_black = rpm_grid(mask);
-z_black = Cp_grid(mask);
-
-scatter3(x_black, y_black, z_black, 20, 'k', 'filled');
-hold off;
-
-%%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % Puplication style Plotters  %
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+%%
+figure('Name','theta angle')
+ax = gca;
+set(ax, 'FontSize', 14, 'LineWidth', 1.2);
+set(ax, 'TickLabelInterpreter', 'latex');
+plot(t, , '.', 'Color', 'k', 'MarkerSize', 8);
+xlabel('$J$', 'FontSize', 14, 'Interpreter', 'latex');
+ylabel('$P$ [W]', 'FontSize', 14, 'Interpreter', 'latex');
+box on;
 
 %%
 figure('Name','P(J)');

@@ -1,10 +1,12 @@
-mat1 = load('post_data/flight/temp.mat');
-mat2 = load('post_data/flight/148.mat');
+clear;
+
+mat1 = load('post_data/flight/0254.mat');
+mat2 = load('post_data/flight/0257.mat');
 ac_data_merged = merge_two_mat2ac_data(mat1, mat2);
 
 %% save as "ac_data" for consistency
 ac_data = ac_data_merged;
-save(fullfile("post_data/flight", "144-145-148"), 'ac_data');
+save(fullfile("post_data/flight", "0254-0257"), 'ac_data');
 
 %%
 function ac_data_merged = merge_two_mat2ac_data(mat1, mat2)

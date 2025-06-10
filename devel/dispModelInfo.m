@@ -3,7 +3,8 @@ function dispModelInfo(Y_real, Y_pred, names, coeff, intercept)
     
     MSE = mean((Y_real - Y_pred).^2);
     fprintf('RMSE:  %.2f\n', sqrt(MSE))
-    % fprintf('nRMSE: %.2f\n', sqrt(MSE/std(Y_real)))
+    % fprintf('nRMSE: %.2f\n', sqrt(MSE)/std(Y_real))
+    fprintf('nRMSE: %.2f\n', sqrt(MSE)/(max(Y_real)-min(Y_real)));
 
     SSE = sum((Y_real - Y_pred).^2);
     SST = sum((Y_real - mean(Y_real)).^2);
