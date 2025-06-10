@@ -6,13 +6,13 @@ using MAT
 inspectdr()
 
 rho = 1.225
-Rtip = 8.6/2 * 2.54 * 0.01
+Rtip = 8/2 * 2.54 * 0.01
 Rhub = 0.10*Rtip
 B = 2
 
 rotor = Rotor(Rhub, Rtip, B)
 
-# # propeller geometry
+# # default propeller geometry
 # # r/R    c/R     angle (deg)
 # propgeom = [
 # 0.15   0.130   32.76
@@ -35,7 +35,7 @@ rotor = Rotor(Rhub, Rtip, B)
 # 1.00   0.041   8.99
 # ]
 
-# propeller geometry
+# our propeller geometry
 # r/R    c/R     angle (deg)
 propgeom = [
 0.15   0.153   36.463
