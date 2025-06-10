@@ -6,47 +6,70 @@ using MAT
 inspectdr()
 
 rho = 1.225
-Rtip = 10/2 * 2.54 * 0.01
+Rtip = 8.6/2 * 2.54 * 0.01
 Rhub = 0.10*Rtip
 B = 2
 
 rotor = Rotor(Rhub, Rtip, B)
 
+# # propeller geometry
+# # r/R    c/R     angle (deg)
+# propgeom = [
+# 0.15   0.130   32.76
+# 0.20   0.149   37.19
+# 0.25   0.173   33.54
+# 0.30   0.189   29.25
+# 0.35   0.197   25.64
+# 0.40   0.201   22.54
+# 0.45   0.200   20.27
+# 0.50   0.194   18.46
+# 0.55   0.186   17.05
+# 0.60   0.174   15.97
+# 0.65   0.160   14.87
+# 0.70   0.145   14.09
+# 0.75   0.128   13.39
+# 0.80   0.112   12.84
+# 0.85   0.096   12.25
+# 0.90   0.081   11.37
+# 0.95   0.061   10.19
+# 1.00   0.041   8.99
+# ]
+
 # propeller geometry
 # r/R    c/R     angle (deg)
 propgeom = [
-0.15   0.130   32.76
-0.20   0.149   37.19
-0.25   0.173   33.54
-0.30   0.189   29.25
-0.35   0.197   25.64
-0.40   0.201   22.54
-0.45   0.200   20.27
-0.50   0.194   18.46
-0.55   0.186   17.05
-0.60   0.174   15.97
-0.65   0.160   14.87
-0.70   0.145   14.09
-0.75   0.128   13.39
-0.80   0.112   12.84
-0.85   0.096   12.25
-0.90   0.081   11.37
-0.95   0.061   10.19
-1.00   0.041   8.99
+0.15   0.153   36.463
+0.20   0.175   40.887
+0.25   0.193   36.215
+0.30   0.206   33.089
+0.35   0.219   30.515
+0.40   0.201   28
+0.45   0.222   26.106
+0.50   0.224   23.994
+0.55   0.225   22.072
+0.60   0.220   21.197
+0.65   0.203   19.712
+0.70   0.197   18.986
+0.75   0.186   17.566
+0.80   0.168   16.264
+0.85   0.156   14.826
+0.90   0.130   14.058
+0.95   0.102   11.214
+1.00   0.069   8.47
 ]
 
 r = propgeom[:, 1] * Rtip
 chord = propgeom[:, 2] * Rtip
 theta = propgeom[:, 3] * pi/180
 
-af = AlphaAF("airfoils/clark_y_mod_10.4t_30.3c_5.8cam_43.9c.dat")
+af = AlphaAF("airfoils/naca4412.dat")
 
 sections = Section.(r, chord, theta, Ref(af))
 
 # define the range of the input to the BEM algorithm (rpm,Va)
 nRPM = 100
 nVa = 100
-Va = range(0.1, 30, length=nVa)
+Va = range(0.01, 35, length=nVa)
 rpm = range(0, 10000, length=nRPM)
 P = zeros(nVa,nRPM)
 P2 = zeros(nVa,nRPM)
@@ -70,13 +93,10 @@ end
 P[P .< 0] .= NaN
 
 # plot P vs Va for selected RPM
-plot(Va,P[:,10],  label="1000", linewidth=2, xlabel="Airspeed (m/s)", ylabel="Power (W)", show=true)
-plot!(Va,P[:,30], label="3000", linewidth=2)
-plot!(Va,P[:,50], label="5000", linewidth=2)
+plot(Va,P[:,50],  label="5000", linewidth=2, xlabel="Airspeed (m/s)", ylabel="Power (W)", show=true)
+plot!(Va,P[:,60], label="6000", linewidth=2)
 plot!(Va,P[:,70], label="7000", linewidth=2)
-plot!(Va,P[:,90], label="9000", linewidth=2)
-
-plot!(Va,P2[:,10], label="1000 P2", linewidth=2)
+plot!(Va,P[:,80], label="8000", linewidth=2)
 
 # restructure the data in a (rpm,P,Va) format, using dataframes
 X = zeros(nRPM*nVa,2)
