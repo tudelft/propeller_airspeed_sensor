@@ -25,7 +25,7 @@ datarange = datarange & ~isnan(power) ...
                       & J>Jcrit;
 
 %% Fit
-[X_Va, names_Va] = model_structure_Pw(power, rpm, [], p_model_structure);
+[X_Va, names_Va] = model_structure_Pw(power, rpm*pi/30, [], p_model_structure);
 [B_Va, FitInfo_Va] = lasso(X_Va(datarange,:), airspeed(datarange), 'Lambda', 1e-10);
 
 [X_J, names_J] = model_structure_Cp(Cp, Cp_model_structure); 
