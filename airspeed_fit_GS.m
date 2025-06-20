@@ -75,19 +75,19 @@ Y2 = Veast - VWE;
 
 [X_Va, names] = model_structure_Pw(power, rpm*pi/30, [], p_model_structure);
 % scale
-X_Va(:,1) = X_Va(:,1)*10^-3;
-X_Va(:,2) = X_Va(:,2)*10^16;
+X_Va(:,1) = X_Va(:,1)*10^-2;
+X_Va(:,2) = X_Va(:,2)*10^11;
 % form the total input matrix
 X1 = X_Va .* cos(gamma) .* cos(psi);
 X2 = X_Va .* cos(gamma) .* sin(psi);
 % fit
 B_Va = [X1(datarange,:); X2(datarange,:)] \ [Y1(datarange); Y2(datarange)];
 % scale coefficients back
-B_Va(1) = B_Va(1)*10^-3;
-B_Va(2) = B_Va(2)*10^16;
+B_Va(1) = B_Va(1)*10^-2;
+B_Va(2) = B_Va(2)*10^11;
 % scale input matrix back
-X_Va(:,1) = X_Va(:,1)*10^3;
-X_Va(:,2) = X_Va(:,2)*10^-16;
+X_Va(:,1) = X_Va(:,1)*10^2;
+X_Va(:,2) = X_Va(:,2)*10^-11;
 X1 = X_Va .* cos(gamma) .* cos(psi);
 X2 = X_Va .* cos(gamma) .* sin(psi);
 

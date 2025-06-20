@@ -46,16 +46,16 @@ datarange = datarange & J>Jcrit;
 %% Fit
 [X_Va, names_Va] = model_structure_Pw(power, rpm*pi/30, [], p_model_structure);
 % scale input matrix; a naive normalizing
-X_Va(:,1) = X_Va(:,1)*10^-3;
-X_Va(:,2) = X_Va(:,2)*10^16;
+X_Va(:,1) = X_Va(:,1)*10^-2;
+X_Va(:,2) = X_Va(:,2)*10^11;
 % fit
 B_Va = X_Va(datarange,:) \ airspeed(datarange);
 % scale coefficients back to normal
-B_Va(1) = B_Va(1)*10^-3;
-B_Va(2) = B_Va(2)*10^16;
+B_Va(1) = B_Va(1)*10^-2;
+B_Va(2) = B_Va(2)*10^11;
 % scale input matrix back to normal
-X_Va(:,1) = X_Va(:,1)*10^3;
-X_Va(:,2) = X_Va(:,2)*10^-16;
+X_Va(:,1) = X_Va(:,1)*10^2;
+X_Va(:,2) = X_Va(:,2)*10^-11;
 
 [X_J, names_J] = model_structure_Cp(Cp, Cp_model_structure);    
 X_J = [ones(length(X_J),1) X_J]; % add the intercept
