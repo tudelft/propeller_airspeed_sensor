@@ -8,7 +8,7 @@ p_model_structure = 'bem_reduced';
 Cp_model_structure = 'bem_reduced';
 
 D = 8*0.0254;
-R = 0.072;
+R = 0.079;
 motor_arm = 0.24;
 
 tranges = [45.8 109.3]; % alpha < 30
