@@ -26,19 +26,41 @@ datarange = datarange & ~isnan(power) ...
 
 %% Fit
 [X_Va, names_Va] = model_structure_Pw(power, rpm*pi/30, [], p_model_structure);
-[B_Va, FitInfo_Va] = lasso(X_Va(datarange,:), airspeed(datarange), 'Lambda', 1e-10);
+% scale input matrix; a naive normalizing
+X_Va(:,1) = X_Va(:,1)*10^-2;
+X_Va(:,2) = X_Va(:,2)*10^11;
+% fit
+B_Va = X_Va(datarange,:) \ airspeed(datarange);
+% scale coefficients back to normal
+B_Va(1) = B_Va(1)*10^-2;
+B_Va(2) = B_Va(2)*10^11;
+% scale input matrix back to normal
+X_Va(:,1) = X_Va(:,1)*10^2;
+X_Va(:,2) = X_Va(:,2)*10^-11;
 
-[X_J, names_J] = model_structure_Cp(Cp, Cp_model_structure); 
-[B_J, FitInfo_J] = lasso(X_J(datarange,:), J(datarange), 'Lambda', 1e-10);
+[X_J, names_J] = model_structure_Cp(Cp, Cp_model_structure);    
+X_J = [ones(length(X_J),1) X_J]; % add the intercept
+% scale input matrix; a naive normalizing
+X_J(:,1) = X_J(:,1)*10^-1;
+X_J(:,3) = X_J(:,3)*10^3;
+% fit
+B_J = X_J(datarange,:) \ J(datarange);
+% scale coefficients back to normal
+B_J(1) = B_J(1)*10^-1;
+B_J(3) = B_J(3)*10^3;
+% scale input matrix back to normal
+X_J(:,1) = X_J(:,1)*10^1;
+X_J(:,3) = X_J(:,3)*10^-3;
 
-intercept_Va = FitInfo_Va.Intercept;
+intercept_Va = 0;
 coeff_Va = B_Va;
-intercept_J = FitInfo_J.Intercept;
-coeff_J = B_J;
+intercept_J = B_J(1);
+coeff_J = B_J(2:3);
 
 %% fitted timeseries
 Va_hat = X_Va(datarange,:) * coeff_Va + intercept_Va;
-J_hat = X_J(datarange,:) * coeff_J + intercept_J;
+
+J_hat = X_J(datarange,:) * B_J;
 Va_hat2 = J_hat .* (rpm(datarange)/60) * D;
 
 dispModelInfo(airspeed(datarange), Va_hat, names_Va, coeff_Va, intercept_Va);
@@ -61,7 +83,7 @@ for c = 1:1:100 % iterate over all rpm (datarange)values (columns)
         end
 
         Va_constRPM_hat(r,c) = X_Va(100*(c-1)+r,:) * coeff_Va + intercept_Va;
-        Va_constRPM_hat2(r,c) = (X_J(100*(c-1)+r,:) * coeff_J + intercept_J) * (w(c)/60) * D;
+        Va_constRPM_hat2(r,c) = (X_J(100*(c-1)+r,2:3) * coeff_J + intercept_J) * (w(c)/60) * D;
     end
 end
 
