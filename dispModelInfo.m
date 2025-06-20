@@ -2,7 +2,7 @@ function dispModelInfo(Y_real, Y_pred, names, coeff, intercept)
     MSE = mean((Y_real - Y_pred).^2);
     fprintf('---------------------------------------\n');
     fprintf('RMSE:  %.2f\n', sqrt(MSE))
-    fprintf('nRMSE: %.2f\n', sqrt(MSE)/(max(Y_real)-min(Y_real)));
+    fprintf('nRMSE: %.3f\n', sqrt(MSE)/(max(Y_real)-min(Y_real)));
 
     fprintf('# Selected features and coefficients\n');
     fprintf('Intercept: %.2e\n', intercept);
