@@ -73,7 +73,7 @@ datarange = logical(datarange);
 Y1 = Vnorth - VWN; 
 Y2 = Veast - VWE;
 
-[X_Va, names] = model_structure_Pw(power, rpm, rpm_dot, p_model_structure);
+[X_Va, names] = model_structure_Pw(power, rpm*pi/30, [], p_model_structure);
 % scale
 X_Va(:,1) = X_Va(:,1)*10^-3;
 X_Va(:,2) = X_Va(:,2)*10^16;

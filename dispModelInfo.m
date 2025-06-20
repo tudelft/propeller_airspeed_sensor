@@ -4,7 +4,7 @@ function dispModelInfo(Y_real, Y_pred, names, coeff, intercept)
     fprintf('RMSE:  %.2f\n', sqrt(MSE))
     fprintf('nRMSE: %.2f\n', sqrt(MSE)/(max(Y_real)-min(Y_real)));
 
-    fprintf('# Selected features and coefficients (Assumed omega in RPM, for rad/sec scale accordingly)#\n');
+    fprintf('# Selected features and coefficients\n');
     fprintf('Intercept: %.2e\n', intercept);
     nonzeroIdx = find(coeff ~= 0);
     for k = 1:length(nonzeroIdx)
