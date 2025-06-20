@@ -30,7 +30,7 @@ p_model_structure = 'bem_reduced';
 Cp_model_structure = 'bem_reduced';
 
 D = 8*0.0254;
-R = 0.072;
+R = 0.079;
 motor_arm = 0.24;
 
 Jcrit = 0.21;
@@ -84,7 +84,7 @@ alpha = theta - gamma;
 datarange = datarange & alpha<alpha_crit;
 
 %%
-[X_Va, names_Va] = model_structure_Pw(power, rpm, rpm_dot, p_model_structure);
+[X_Va, names_Va] = model_structure_Pw(power, rpm*pi/30, [], p_model_structure);
 intercept_Va = 0;
 
 [X_J, names_J] = model_structure_Cp(Cp, Cp_model_structure);
