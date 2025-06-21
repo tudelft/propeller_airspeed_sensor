@@ -2,7 +2,7 @@ clear;
 close all;
 
 %% user input
-load('./data/training.mat')
+load('../data/training.mat')
 
 p_model_structure = 'bem_reduced';
 Cp_model_structure = 'bem_reduced';
@@ -161,5 +161,5 @@ axis padded
 
 %% save models
 % names_Va = {'w', 'p^2*w^-5'};
-% save('./models/flight_GS.mat', 'names_Va', 'coeff_Va');
-% save('./models/flight_GS_j.mat', 'names_J', 'coeff_J', 'intercept_J');
+% save('../models/flight_GS.mat', 'names_Va', 'coeff_Va');
+% save('../models/flight_GS_j.mat', 'names_J', 'coeff_J', 'intercept_J');

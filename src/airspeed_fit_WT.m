@@ -2,7 +2,7 @@ clear;
 close all;
 
 %% user input
-load('./data/wt.mat')
+load('../data/wt.mat')
 Jcrit = 0.21;
 
 p_model_structure = 'bem_reduced';
@@ -113,9 +113,9 @@ box on;
 axis padded
 
 %% save models
-% save('./models/WT.mat', 'names_Va', 'coeff_Va');
-% save('./models/WT_j.mat', 'names_J', 'coeff_J', 'intercept_J');
+% save('../models/WT.mat', 'names_Va', 'coeff_Va');
+% save('../models/WT_j.mat', 'names_J', 'coeff_J', 'intercept_J');
 
 %% save data for Jcrit calculation
 % J_wt = J(datarange) ; Cp_wt = Cp(datarange);
-% save('./data/Jcrit/wt.mat', 'J_wt', 'Cp_wt');
+% save('../data/Jcrit/wt.mat', 'J_wt', 'Cp_wt');
