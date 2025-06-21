@@ -2,7 +2,7 @@ clear;
 close all;
 
 %% user input
-load('./data/BEM.mat')
+load('../data/BEM.mat')
 Jcrit = 0.21;
 
 D = 8*0.0254;
