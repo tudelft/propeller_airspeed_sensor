@@ -34,7 +34,7 @@ R = 0.079;
 motor_arm = 0.24;
 
 Jcrit = 0.21;
-alpha_crit = 30*pi/180;
+alpha_crit = 25*pi/180;
 
 %%
 airspeed = data.airspeed;
