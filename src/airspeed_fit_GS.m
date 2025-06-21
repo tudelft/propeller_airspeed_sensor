@@ -11,7 +11,7 @@ D = 8*0.0254;
 R = 0.079;
 motor_arm = 0.24;
 
-tranges = [45.8 109.3]; % alpha < 30
+alpha_crit = 30*pi/180;
 
 %%
 airspeed = data.airspeed;
@@ -44,30 +44,26 @@ power = filtfilt(b,a,power);
 psi = filtfilt(b,a,psi);
 Vnorth = filtfilt(b,a,Vnorth);
 Veast = filtfilt(b,a,Veast);
-
-%% calibrate airspeed
-
-gamma = asin(-Vdown./velocity);
-theta = theta + pi/2;
-alpha = theta - gamma;
-
-[calib_test, VWN, VWE] = calib_airspeed(airspeed_uav, Vnorth, Veast, gamma, psi, t);
+Vdown = filtfilt(b,a,Vdown);
+velocity = filtfilt(b,a,velocity);
+theta = filtfilt(b,a,theta);
 
 %%
 J = airspeed./((rpm/60)*D);
 Cp = power./(1.225*D^5*(rpm/60).^3);
+gamma = asin(-Vdown./velocity);
+theta = theta + pi/2;
+alpha = theta - gamma;
+
+%% calibrate airspeed
+[calib_test, VWN, VWE] = calib_airspeed(airspeed_uav, Vnorth, Veast, gamma, psi, t);
 
 %% derivatives
 rpm_dot = [zeros(1,1); diff(rpm,1)]*fs;
 
 %%
-datarange = zeros(length(t),1);
-for i = 1:size(tranges,1)
-    trange = tranges(i,:);
-    idx = t >= trange(1) & t <= trange(2);
-    datarange = datarange | idx;
-end
-datarange = logical(datarange);
+datarange = ones(length(t),1);
+datarange = datarange & alpha<alpha_crit;
 
 %% Fit
 Y1 = Vnorth - VWN; 
