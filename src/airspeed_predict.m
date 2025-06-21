@@ -59,28 +59,23 @@ filter_freq = 5;
 
 airspeed = filtfilt(b,a,airspeed);
 rpm = filtfilt(b,a,rpm);
-power= filtfilt(b,a,power);
+power = filtfilt(b,a,power);
+Vdown = filtfilt(b,a,Vdown);
+velocity = filtfilt(b,a,velocity);
+theta = filtfilt(b,a,theta);
 
 %%
 J = airspeed./((rpm/60)*D);
 Cp = power./(1.225*D^5*(rpm/60).^3);
+gamma = asin(-Vdown./velocity);
+theta = theta + pi/2;
+alpha = theta - gamma;
 
 %% derivatives
 rpm_dot = [zeros(1,1); diff(rpm,1)]*fs;
 
 %%
-% datarange = zeros(length(t),1);
-% for i = 1:size(tranges,1)
-%     trange = tranges(i,:);
-%     idx = t >= trange(1) & t <= trange(2);
-%     datarange = datarange | idx;
-% end
-% datarange = logical(datarange);
 datarange = ones(length(t),1);
-% datarange = datarange & J>Jcrit;
-gamma = asin(-Vdown./velocity);
-theta = theta + pi/2;
-alpha = theta - gamma;
 datarange = datarange & alpha<alpha_crit;
 
 %%
