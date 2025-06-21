@@ -1,5 +1,5 @@
 function [X, names] = model_structure_Cp(Cp, model_structure)
-    if strcmp(model_structure, 'bem')
+    if strcmp(model_structure, 'bem_reduced')
         X = [Cp Cp.^4];
         names = {'Cp', 'Cp^4'};
     else

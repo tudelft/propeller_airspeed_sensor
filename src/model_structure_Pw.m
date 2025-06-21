@@ -1,5 +1,4 @@
-function [X, names] = model_structure_Pw(power, w, wdot, model_structure)
-    
+function [X, names] = model_structure_Pw(power, w, wdot, model_structure)  
     if strcmp(model_structure, 'bem_reduced')
         X = [w ,...
              power.^(2).*w.^(-5)];
