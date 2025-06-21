@@ -1,9 +1,9 @@
 clear;
 close all;
 
-load('./data/Jcrit/BEM.mat')
-load('./data/Jcrit/wt.mat')
-load('./data/Jcrit/flight.mat')
+load('../data/Jcrit/BEM.mat')
+load('../data/Jcrit/wt.mat')
+load('../data/Jcrit/flight.mat')
 
 % fit cubic and predict Cp_hat
 X_Cp_bem = [J_bem J_bem.^2 J_bem.^3];

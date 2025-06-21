@@ -2,27 +2,27 @@ clear;
 close all;
 
 %% user input
-load('./data/test.mat')
+load('../data/test.mat')
 
-load('./models/BEM.mat')
+load('../models/BEM.mat')
 coeff_Va_BEM = coeff_Va;
-load('./models/WT.mat')
+load('../models/WT.mat')
 coeff_Va_WT = coeff_Va;
-load('./models/flight_AS.mat')
+load('../models/flight_AS.mat')
 coeff_Va_AS = coeff_Va;
-load('./models/flight_GS.mat')
+load('../models/flight_GS.mat')
 coeff_Va_GS = coeff_Va;
 
-load('./models/BEM_j.mat')
+load('../models/BEM_j.mat')
 coeff_J_BEM = coeff_J;
 intercept_J_BEM = intercept_J;
-load('./models/WT_j.mat')
+load('../models/WT_j.mat')
 coeff_J_WT = coeff_J;
 intercept_J_WT = intercept_J;
-load('./models/flight_AS_j.mat')
+load('../models/flight_AS_j.mat')
 coeff_J_AS = coeff_J;
 intercept_J_AS = intercept_J;
-load('./models/flight_GS_j.mat')
+load('../models/flight_GS_j.mat')
 coeff_J_GS = coeff_J;
 intercept_J_GS = intercept_J;
 

@@ -2,7 +2,7 @@ clear;
 close all;
 
 %% user input
-load('./data/BEM.mat')
+load('../data/BEM.mat')
 p_model_structure = 'bem_reduced';
 Cp_model_structure = 'bem_reduced';
 Jcrit = 0.21;
@@ -109,9 +109,9 @@ legend boxoff;
 box on;
 
 %% save the models
-% save('./models/BEM.mat', 'names_Va', 'coeff_Va');
-% save('./models/BEM_j.mat', 'names_J', 'coeff_J', 'intercept_J');
+% save('../models/BEM.mat', 'names_Va', 'coeff_Va');
+% save('../models/BEM_j.mat', 'names_J', 'coeff_J', 'intercept_J');
 
 %% save data for Jcrit calculation
 % J_bem = J; Cp_bem = Cp;
-% save('./data/Jcrit/BEM.mat', 'J_bem', 'Cp_bem');
+% save('../data/Jcrit/BEM.mat', 'J_bem', 'Cp_bem');
