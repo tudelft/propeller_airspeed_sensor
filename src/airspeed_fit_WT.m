@@ -37,7 +37,7 @@ rpm_dot = [zeros(1,1); diff(rpm,1)]*fs;
 %%
 datarange = ones(length(t),1);
 datarange = datarange & power>20 ...                   % avoid windmilling
-                      & rpm_dot<500 & rpm_dot>-500 ... % remove steps with transient effects
+                      & rpm_dot<500 & rpm_dot>-500 ... % remove transients; keep steady state
                       & rpm<10000 ...                  % motor gets hot and R changes
                       & J>Jcrit;                       % the selection criterion
 
