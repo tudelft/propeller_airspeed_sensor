@@ -13,6 +13,8 @@ coeff_Va_AS = coeff_Va;
 load('../models/flight_GS.mat')
 coeff_Va_GS = coeff_Va;
 
+intercept_Va = 0;
+
 load('../models/BEM_j.mat')
 coeff_J_BEM = coeff_J;
 intercept_J_BEM = intercept_J;
@@ -28,13 +30,12 @@ intercept_J_GS = intercept_J;
 
 p_model_structure = 'bem_reduced';
 Cp_model_structure = 'bem_reduced';
+Jcrit = 0.21;
+alpha_crit = 25*pi/180;
 
 D = 8*0.0254;
 R = 0.079;
 motor_arm = 0.24;
-
-Jcrit = 0.21;
-alpha_crit = 25*pi/180;
 
 %%
 airspeed = data.airspeed;
@@ -78,13 +79,10 @@ rpm_dot = [zeros(1,1); diff(rpm,1)]*fs;
 datarange = ones(length(t),1);
 datarange = datarange & alpha<alpha_crit;
 
-%%
+%% Predict
 [X_Va, names_Va] = model_structure_Pw(power, rpm*pi/30, [], p_model_structure);
-intercept_Va = 0;
-
 [X_J, names_J] = model_structure_Cp(Cp, Cp_model_structure);
 
-%% Predict
 Va_hat_BEM = X_Va(datarange,:) * coeff_Va_BEM + intercept_Va;
 Va_hat_WT = X_Va(datarange,:) * coeff_Va_WT + intercept_Va;
 Va_hat_AS = X_Va(datarange,:) * coeff_Va_AS + intercept_Va;
@@ -112,7 +110,7 @@ disp("GS metrics");
 dispModelInfo(airspeed(datarange), Va_hat_GS, names_Va, coeff_Va_GS, intercept_Va);
 dispModelInfo(airspeed(datarange), Va_hat2_GS, names_J, coeff_J_GS, intercept_J_GS);
 
-%% 
+%% plot AoA and J
 figure('Name','Angle of Attack and Advance Ratio');
 
 ax = gca;

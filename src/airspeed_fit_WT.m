@@ -3,13 +3,13 @@ close all;
 
 %% user input
 load('../data/wt.mat')
-Jcrit = 0.21;
-
 p_model_structure = 'bem_reduced';
 Cp_model_structure = 'bem_reduced';
+Jcrit = 0.21;
 
 D = 8*0.0254;
 R = 0.079;
+
 %%
 airspeed = data.airspeed;
 rpm = data.rpm;
@@ -69,10 +69,6 @@ B_J(3) = B_J(3)*10^3;
 X_J(:,1) = X_J(:,1)*10^1;
 X_J(:,3) = X_J(:,3)*10^-3;
 
-% [X_J, names_J] = model_structure_Cp(Cp, Cp_model_structure);    
-% X_J = [ones(length(X_J),1) X_J] .* (rpm/60) * D;
-% B_J = X_J(datarange,:) \ airspeed(datarange);
-
 intercept_Va = 0;
 coeff_Va = B_Va;
 intercept_J = B_J(1);
@@ -83,7 +79,6 @@ Va_hat = X_Va(datarange,:) * coeff_Va + intercept_Va;
 
 J_hat = X_J(datarange,:) * B_J;
 Va_hat2 = J_hat .* (rpm(datarange)/60) * D;
-% Va_hat2 = X_J(datarange,:) * B_J;
 
 dispModelInfo(airspeed(datarange), Va_hat, names_Va, coeff_Va(1:2), intercept_Va);
 dispModelInfo(airspeed(datarange), Va_hat2, names_J, coeff_J, intercept_J);

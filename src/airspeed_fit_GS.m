@@ -3,15 +3,13 @@ close all;
 
 %% user input
 load('../data/training.mat')
-
 p_model_structure = 'bem_reduced';
 Cp_model_structure = 'bem_reduced';
+alpha_crit = 25*pi/180;
 
 D = 8*0.0254;
 R = 0.079;
 motor_arm = 0.24;
-
-alpha_crit = 25*pi/180;
 
 %%
 airspeed = data.airspeed;
@@ -39,6 +37,7 @@ filter_freq = 5;
 [b, a] = butter(2,filter_freq/(fs/2));
 
 airspeed = filtfilt(b,a,airspeed);
+airspeed_uav = filtfilt(b,a,airspeed_uav);
 rpm = filtfilt(b,a,rpm);
 power = filtfilt(b,a,power);
 psi = filtfilt(b,a,psi);
@@ -89,22 +88,11 @@ X2 = X_Va .* cos(gamma) .* sin(psi);
 
 [X_J, names_J] = model_structure_Cp(Cp, Cp_model_structure);
 X_J = [ones(length(X_J),1) X_J]; % add intercept
-% scale
-% X_J(:,1) = X_J(:,1)*10^-1;
-% X_J(:,3) = X_J(:,3)*10^3;
 % form input matrix
 X1_J = (X_J .* (rpm/60) * D) .* cos(gamma) .* cos(psi);
 X2_J = (X_J .* (rpm/60) * D) .* cos(gamma) .* sin(psi);
 % fit
 B_J = [X1_J(datarange,:); X2_J(datarange,:)] \ [Y1(datarange); Y2(datarange)];
-% scale coefficients back to normal
-% B_J(1) = B_J(1)*10^-1;
-% B_J(3) = B_J(3)*10^3;
-% % scale input matrix back to normal
-% X_J(:,1) = X_J(:,1)*10^1;
-% X_J(:,3) = X_J(:,3)*10^-3;
-% X1_J = (X_J .* (rpm/60) * D) .* cos(psi);
-% X2_J = (X_J .* (rpm/60) * D) .* sin(psi);
 
 intercept_Va = 0;
 coeff_Va = B_Va;
@@ -123,7 +111,7 @@ Va_hat2 = sqrt(Va_north_hat_J.^2 + Va_east_hat_J.^2);
 dispModelInfo(airspeed(datarange), Va_hat, names, coeff_Va, intercept_Va);
 dispModelInfo(airspeed(datarange), Va_hat2, names_J, coeff_J, intercept_J);
 
-%% estimate AoA
+%% plot AoA
 figure('Name','Angle of Attack');
 ax = gca;
 set(ax, 'FontSize', 14, 'LineWidth', 1.2);
