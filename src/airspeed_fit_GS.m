@@ -69,17 +69,17 @@ Y1 = Vnorth - VWN;
 Y2 = Veast - VWE;
 
 [X_Va, names] = model_structure_Pw(power, rpm*pi/30, [], p_model_structure);
-% scale
+% scale input matrix to avoid matrix rank numerical issues; p^2/w^5 feature produces very small numbers
 X_Va(:,2) = X_Va(:,2)*10^11;
 % form the total input matrix
 X1 = X_Va .* cos(gamma) .* cos(psi);
 X2 = X_Va .* cos(gamma) .* sin(psi);
 % fit
 B_Va = [X1(datarange,:); X2(datarange,:)] \ [Y1(datarange); Y2(datarange)];
-% scale coefficients back
+% scale back
 B_Va(2) = B_Va(2)*10^11;
-% scale input matrix back
 X_Va(:,2) = X_Va(:,2)*10^-11;
+
 X1 = X_Va .* cos(gamma) .* cos(psi);
 X2 = X_Va .* cos(gamma) .* sin(psi);
 
