@@ -151,7 +151,6 @@ hold on;
 plot(t(datarange), airspeed(datarange), '-', 'Color', 'k', 'LineWidth', 2);
 scatter(t(1:20:end), airspeed(1:20:end), 5, 'k', 'filled');
 plot(t(datarange), Va_hat_BEM, '-', 'Color', [178,171,210]/255, 'LineWidth', 0.6); % deep purple , [94,60,153]/255 dark 
-% plot(t(datarange), Va_hat_AS, '-', 'Color', [253,184,99]/255, 'LineWidth', 0.6);   % yellow-like
 plot(t(datarange), Va_hat_GS, '-', 'Color', [230,97,1]/255, 'LineWidth', 0.6); % orange-like
 hold off;
 xlabel('$t$ [s]', 'FontSize', 14, 'Interpreter', 'latex');
