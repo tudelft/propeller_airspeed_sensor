@@ -26,13 +26,12 @@ datarange = datarange & ~isnan(power) ...
 
 %% Fit
 [X_Va, names_Va] = model_structure_Pw(power, rpm*pi/30, [], p_model_structure);
-% scale input matrix; a naive normalizing
+% scale input matrix to avoid matrix rank numerical issues; p^2/w^5 feature produces very small numbers
 X_Va(:,2) = X_Va(:,2)*10^11;
 % fit
 B_Va = X_Va(datarange,:) \ airspeed(datarange);
-% scale coefficients back to normal
+% scale back
 B_Va(2) = B_Va(2)*10^11;
-% scale input matrix back to normal
 X_Va(:,2) = X_Va(:,2)*10^-11;
 
 [X_J, names_J] = model_structure_Cp(Cp, Cp_model_structure);    
