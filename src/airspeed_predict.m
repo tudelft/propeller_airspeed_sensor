@@ -34,7 +34,6 @@ Jcrit = 0.21;
 alpha_crit = 25*pi/180;
 
 D = 8*0.0254;
-R = 0.079;
 motor_arm = 0.24;
 
 %%
@@ -50,7 +49,7 @@ theta = data.theta;
 t = data.t;
 fs = data.fs;
 
-power = voltage.*current - current.^2*R;
+power = voltage.*current;
 airspeed = airspeed - gyrop*motor_arm;
 velocity = sqrt(Vnorth.^2 + Veast.^2 + Vdown.^2);
 

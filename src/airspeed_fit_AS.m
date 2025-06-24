@@ -8,7 +8,6 @@ Cp_model_structure = 'bem_reduced';
 Jcrit = 0.21; 
 
 D = 8*0.0254;
-R = 0.079;
 motor_arm = 0.24;
 
 %%
@@ -20,7 +19,7 @@ gyrop = data.gyrop;
 t = data.t;
 fs = data.fs;
 
-power = voltage.*current - current.^2*R;
+power = voltage.*current;
 airspeed = airspeed - gyrop*motor_arm;
 
 %% filter with Butterworth
