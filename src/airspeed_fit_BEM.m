@@ -3,8 +3,6 @@ close all;
 
 %% user input
 load('../data/BEM.mat')
-p_model_structure = 'bem_reduced';
-Cp_model_structure = 'bem_reduced';
 Jcrit = 0.20;
 
 D = 8*0.0254;
@@ -25,7 +23,7 @@ datarange = datarange & ~isnan(power) ...
                       & J>Jcrit;
 
 %% Fit
-[X_Va, names_Va] = model_structure_Pw(power, rpm*pi/30, [], p_model_structure);
+[X_Va, names_Va] = model_structure_Pw(power, rpm*pi/30, [], 'bem_reduced');
 % scale input matrix to avoid matrix rank numerical issues; p^2/w^5 feature produces very small numbers
 X_Va(:,2) = X_Va(:,2)*10^11;
 % fit
@@ -34,7 +32,7 @@ B_Va = X_Va(datarange,:) \ airspeed(datarange);
 B_Va(2) = B_Va(2)*10^11;
 X_Va(:,2) = X_Va(:,2)*10^-11;
 
-[X_J, names_J] = model_structure_Cp(Cp, Cp_model_structure);    
+[X_J, names_J] = model_structure_Cp(Cp, 'bem_reduced');    
 X_J = [ones(length(X_J),1) X_J]; % add the intercept
 % fit
 B_J = X_J(datarange,:) \ J(datarange);

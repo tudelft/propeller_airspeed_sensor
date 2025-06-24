@@ -28,13 +28,12 @@ load('../models/flight_GS_j.mat')
 coeff_J_GS = coeff_J;
 intercept_J_GS = intercept_J;
 
-p_model_structure = 'bem_reduced';
-Cp_model_structure = 'bem_reduced';
-Jcrit = 0.21;
+Jcrit = 0.20;
 alpha_crit = 25*pi/180;
 
 D = 8*0.0254;
 motor_arm = 0.24;
+efficiency = 0.865;
 
 %%
 airspeed = data.airspeed;
@@ -49,7 +48,7 @@ theta = data.theta;
 t = data.t;
 fs = data.fs;
 
-power = voltage.*current;
+power = voltage.*current*efficiency;
 airspeed = airspeed - gyrop*motor_arm;
 velocity = sqrt(Vnorth.^2 + Veast.^2 + Vdown.^2);
 
@@ -79,8 +78,8 @@ datarange = ones(length(t),1);
 datarange = datarange & alpha<alpha_crit;
 
 %% Predict
-[X_Va, names_Va] = model_structure_Pw(power, rpm*pi/30, [], p_model_structure);
-[X_J, names_J] = model_structure_Cp(Cp, Cp_model_structure);
+[X_Va, names_Va] = model_structure_Pw(power, rpm*pi/30, [], 'bem_reduced');
+[X_J, names_J] = model_structure_Cp(Cp, 'bem_reduced');
 
 Va_hat_BEM = X_Va(datarange,:) * coeff_Va_BEM + intercept_Va;
 Va_hat_WT = X_Va(datarange,:) * coeff_Va_WT + intercept_Va;
