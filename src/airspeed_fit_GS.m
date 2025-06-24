@@ -3,12 +3,11 @@ close all;
 
 %% user input
 load('../data/training.mat')
-p_model_structure = 'bem_reduced';
-Cp_model_structure = 'bem_reduced';
 alpha_crit = 25*pi/180;
 
 D = 8*0.0254;
 motor_arm = 0.24;
+efficiency = 0.865;
 
 %%
 airspeed = data.airspeed;
@@ -24,7 +23,7 @@ theta = data.theta;
 t = data.t;
 fs = data.fs;
 
-power = voltage.*current;
+power = voltage.*current*efficiency;
 
 airspeed_uav = airspeed;
 airspeed = airspeed - gyrop*motor_arm;
@@ -67,7 +66,7 @@ datarange = datarange & alpha<alpha_crit;
 Y1 = Vnorth - VWN; 
 Y2 = Veast - VWE;
 
-[X_Va, names] = model_structure_Pw(power, rpm*pi/30, [], p_model_structure);
+[X_Va, names] = model_structure_Pw(power, rpm*pi/30, [], 'bem_reduced');
 % scale input matrix to avoid matrix rank numerical issues; p^2/w^5 feature produces very small numbers
 X_Va(:,2) = X_Va(:,2)*10^11;
 % form the total input matrix
@@ -82,7 +81,7 @@ X_Va(:,2) = X_Va(:,2)*10^-11;
 X1 = X_Va .* cos(gamma) .* cos(psi);
 X2 = X_Va .* cos(gamma) .* sin(psi);
 
-[X_J, names_J] = model_structure_Cp(Cp, Cp_model_structure);
+[X_J, names_J] = model_structure_Cp(Cp, 'bem_reduced');
 X_J = [ones(length(X_J),1) X_J]; % add intercept
 % form input matrix
 X1_J = (X_J .* (rpm/60) * D) .* cos(gamma) .* cos(psi);
