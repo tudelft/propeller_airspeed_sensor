@@ -86,6 +86,7 @@ for i = 10:10:100
 end
 xlabel('$P$ [W]', 'FontSize', 14, 'Interpreter', 'latex');
 ylabel('$V_a$ [m/s]', 'FontSize', 14, 'Interpreter', 'latex');
+xlim([0,170]);
 ylim([0,30]);
 h = legend('BEM', ...
            '$\beta_1 \omega + \beta_2 \frac{P^2}{\omega^5}$', ...

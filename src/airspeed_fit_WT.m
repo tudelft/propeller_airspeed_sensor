@@ -8,7 +8,6 @@ Cp_model_structure = 'bem_reduced';
 Jcrit = 0.21;
 
 D = 8*0.0254;
-R = 0.079;
 
 %%
 airspeed = data.airspeed;
@@ -18,7 +17,7 @@ current = data.current;
 t = data.t;
 fs = data.fs;
 
-power = voltage.*current - current.^2*R;
+power = voltage.*current;
 
 %% filter with Butterworth
 filter_freq = 5;
