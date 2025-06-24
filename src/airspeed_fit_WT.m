@@ -5,7 +5,7 @@ close all;
 load('../data/wt.mat')
 p_model_structure = 'bem_reduced';
 Cp_model_structure = 'bem_reduced';
-Jcrit = 0.21;
+Jcrit = 0.20;
 
 D = 8*0.0254;
 
