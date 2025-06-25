@@ -43,7 +43,7 @@ sections = Section.(r, chord, theta, Ref(af))
 nRPM = 100
 nVa = 100
 Va = range(0.1, 35, length=nVa)
-rpm = range(100, 10000, length=nRPM)
+rpm = range(1000, 10000, length=nRPM)
 P = zeros(nVa,nRPM)
 P2 = zeros(nVa,nRPM)
 
