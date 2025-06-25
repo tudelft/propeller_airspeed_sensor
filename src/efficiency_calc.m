@@ -42,7 +42,9 @@ xlabel('$J$', 'FontSize', 14, 'Interpreter', 'latex');
 ylabel('$C_P$', 'FontSize', 14, 'Interpreter', 'latex');
 xlim([0 0.9])
 ylim([0 0.12])
-h = legend('BEM', 'Cubic fit in BEM', '$(1/\eta)\;\times$ Cubic fit in Flight test', 'Flight test');
+h = legend('BEM', ...
+           'Fitted $C_P(J)$', ...
+           'Fitted $C_{P_{in}}(J) = \frac{1}{\eta}C_P(J)$', 'Flight test');
 set(h, 'Interpreter', 'latex');
 set(h, 'FontSize', 11)
 legend boxoff;

@@ -33,7 +33,7 @@ plot([J_roots_bem(2) J_roots_bem(2)], [0 0.076], '--k', 'LineWidth', 0.5);
 hold off;
 xlabel('$J$', 'FontSize', 14, 'Interpreter', 'latex');
 ylabel('$C_P$', 'FontSize', 14, 'Interpreter', 'latex');
-ylim([0 0.12])
+ylim([0 0.1])
 jcrit_str = sprintf('$J_{crit} = %.2f$', J_roots_bem(2));
 h = legend('BEM', 'Fitted', 'Wind tunnel', 'Flight test', jcrit_str);
 set(h, 'Interpreter', 'latex');

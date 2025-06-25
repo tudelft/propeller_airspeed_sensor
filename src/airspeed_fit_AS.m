@@ -7,7 +7,7 @@ Jcrit = 0.20;
 
 D = 8*0.0254;
 motor_arm = 0.24;
-efficiency = 0.865;
+efficiency = 0.874;
 
 %%
 airspeed = data.airspeed;

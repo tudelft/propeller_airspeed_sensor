@@ -33,7 +33,7 @@ alpha_crit = 25*pi/180;
 
 D = 8*0.0254;
 motor_arm = 0.24;
-efficiency = 0.865;
+efficiency = 0.87;
 
 %%
 airspeed = data.airspeed;
@@ -95,16 +95,16 @@ Va_hat2_AS = J_hat_AS .* (rpm(datarange)/60) * D;
 J_hat_GS = X_J(datarange,:) * coeff_J_GS + intercept_J_GS;
 Va_hat2_GS = J_hat_GS .* (rpm(datarange)/60) * D;
 
-disp("BEM metrics");
+disp("****************** BEM metrics ******************");
 dispModelInfo(airspeed(datarange), Va_hat_BEM, names_Va, coeff_Va_BEM, intercept_Va);
 dispModelInfo(airspeed(datarange), Va_hat2_BEM, names_J, coeff_J_BEM, intercept_J_BEM);
-disp("WT metrics");
+disp("****************** WT metrics ******************");
 dispModelInfo(airspeed(datarange), Va_hat_WT, names_Va, coeff_Va_WT, intercept_Va);
 dispModelInfo(airspeed(datarange), Va_hat2_WT, names_J, coeff_J_WT, intercept_J_WT);
-disp("AS metrics");
+disp("****************** AS metrics ******************");
 dispModelInfo(airspeed(datarange), Va_hat_AS, names_Va, coeff_Va_AS, intercept_Va);
 dispModelInfo(airspeed(datarange), Va_hat2_AS, names_J, coeff_J_AS, intercept_J_AS);
-disp("GS metrics");
+disp("****************** GS metrics ******************");
 dispModelInfo(airspeed(datarange), Va_hat_GS, names_Va, coeff_Va_GS, intercept_Va);
 dispModelInfo(airspeed(datarange), Va_hat2_GS, names_J, coeff_J_GS, intercept_J_GS);
 
