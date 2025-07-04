@@ -74,25 +74,22 @@ dispModelInfo(airspeed(datarange), Va_hat2, names_J, coeff_J, intercept_J);
 
 %% visualization
 figure('Name','Airspeed fit using Airspeed data');
-ax = gca;
-set(ax, 'FontSize', 14, 'LineWidth', 1.2);
-set(ax, 'TickLabelInterpreter', 'latex');
+
 hold on;
 scatter(t(datarange), airspeed(datarange), 9, 'k', 'filled');
 scatter(t(datarange), Va_hat, 3, 'r', 'filled');
 scatter(t(datarange), Va_hat2, 3, 'g', 'filled');
-
 hold off;
+
 xlabel('$t$ [s]', 'FontSize', 14, 'Interpreter', 'latex');
 ylabel('$V_a$ [m/s]', 'FontSize', 14, 'Interpreter', 'latex');
+
 h = legend('Ground Truth', ...
            '$\beta_1 \omega + \beta_2 \frac{P^2}{\omega^5}$', ...
            '$\frac{\omega}{2\pi}(\alpha_0 + \alpha_1 C_P + \alpha_2 C_P^4)$');
 set(h, 'Interpreter', 'latex');
-set(h, 'FontSize', 11)
-legend boxoff;
-box on;
-axis padded
+set(h, 'FontSize', 11);
+legend boxoff
 
 %% save models
 % save('../models/flight_AS.mat', 'names_Va', 'coeff_Va');
