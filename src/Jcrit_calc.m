@@ -19,25 +19,27 @@ Cp_hat_bem = X_Cpsynth_bem * coeff_Cp_bem + intercept_Cp_bem;
 J_roots_bem = roots([3*coeff_Cp_bem(3) 2*coeff_Cp_bem(2) coeff_Cp_bem(1)]);
 fprintf('\nJ_root1 = %.2e\nJ_root2 = %.2e\n', J_roots_bem(1), J_roots_bem(2));
 
-% plot
-figure('Name','Cp(J)')
+%% plot
+figure('Name', 'Cp(J)', 'Position', [600, 400, 600, 400]);
+
 ax = gca;
-set(ax, 'FontSize', 14, 'LineWidth', 1.2);
-set(ax, 'TickLabelInterpreter', 'latex');
+set(ax, 'FontSize', 14, 'LineWidth', 1.2, 'TickLabelInterpreter', 'latex');
+
 hold on;
 scatter(J_bem, Cp_bem, 7, 'k', 'filled');
-plot(Jsynth_bem, Cp_hat_bem, 'Color', [230, 97, 1]/255, 'LineWidth', 4, 'LineStyle', ':');
 scatter(J_wt, Cp_wt, 9, [253,184,99]/255, 'filled');
 scatter(J_flight, Cp_flight, 1, [178,171,210]/255, 'filled');
-plot([J_roots_bem(2) J_roots_bem(2)], [0 0.076], '--k', 'LineWidth', 0.5);
+plot(Jsynth_bem, Cp_hat_bem, 'Color', [230, 97, 1]/255, 'LineWidth', 4, 'LineStyle', ':');
+plot([J_roots_bem(2) J_roots_bem(2)], [0 0.077], '--k', 'LineWidth', 0.5);
 hold off;
+
 xlabel('$J$', 'FontSize', 14, 'Interpreter', 'latex');
 ylabel('$C_P$', 'FontSize', 14, 'Interpreter', 'latex');
-ylim([0 0.1])
+ylim([0 0.1]);
+xlim([0 1]);
+
 jcrit_str = sprintf('$J_{crit} = %.2f$', J_roots_bem(2));
-h = legend('BEM', 'Fitted', 'Wind tunnel', 'Flight test', jcrit_str);
-set(h, 'Interpreter', 'latex');
-set(h, 'FontSize', 11)
+h = legend('BEM', 'Wind tunnel', 'Flight test', 'Fitted', jcrit_str);
+set(h, 'Interpreter', 'latex', 'FontSize', 14);
 legend boxoff;
 box on;
-xlim([0 1]);
