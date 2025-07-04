@@ -72,25 +72,28 @@ for c = 1:1:100 % iterate over all rpm (datarange)values (columns)
     end
 end
 
-figure('Name','Va(P), w=const')
+
+%% visualization
+figure('Name','Va(P), omega = const', 'Position', [600, 400, 600, 400]);
 ax = gca;
-set(ax, 'FontSize', 14, 'LineWidth', 1.2);
-set(ax, 'TickLabelInterpreter', 'latex');
+set(ax, 'FontSize', 14, 'LineWidth', 1.2, 'TickLabelInterpreter', 'latex');
 hold on;
-for i = 10:10:100
-    plot(P(:,i), Va, '-', Color='k', LineWidth=2);
+
+for i = 1:11:100
+    plot(P(:,i), Va, '-', 'Color', 'k', 'LineWidth', 2);
     plot(P(:,i), Va_constRPM_hat(:,i), '--', 'Color', [230, 97, 1]/255, 'LineWidth', 2);
     plot(P(:,i), Va_constRPM_hat2(:,i), '--', 'Color', [178,171,210]/255, 'LineWidth', 2);
 end
-xlabel('$P$ [W]', 'FontSize', 14, 'Interpreter', 'latex');
-ylabel('$V_a$ [m/s]', 'FontSize', 14, 'Interpreter', 'latex');
-xlim([0,170]);
-ylim([0,30]);
+
+xlabel('$P$ [W]', 'Interpreter', 'latex', 'FontSize', 14);
+ylabel('$V_a$ [m/s]', 'Interpreter', 'latex', 'FontSize', 14);
+xlim([0, 175]);
+ylim([0, 30]);
+
 h = legend('BEM', ...
            '$\beta_1 \omega + \beta_2 \frac{P^2}{\omega^5}$', ...
-           '$\frac{\omega}{2\pi}(\alpha_0 + \alpha_1 C_P + \alpha_2 C_P^4)$');
-set(h, 'Interpreter', 'latex');
-set(h, 'FontSize', 11)
+           '$\frac{\omega}{2\pi}(\alpha_0 + \alpha_1 C_P + \alpha_2 C_P^4)$', ...
+           'Interpreter', 'latex', 'FontSize', 14);
 legend boxoff;
 box on;
 
