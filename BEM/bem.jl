@@ -42,7 +42,7 @@ sections = Section.(r, chord, theta, Ref(af))
 # define the range of the input to the BEM algorithm (rpm,Va)
 nRPM = 100
 nVa = 100
-Va = range(0.1, 35, length=nVa)
+Va = range(0.1, 30, length=nVa)
 rpm = range(1000, 10000, length=nRPM)
 P = zeros(nVa,nRPM)
 P2 = zeros(nVa,nRPM)
