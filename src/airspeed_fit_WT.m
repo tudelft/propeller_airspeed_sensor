@@ -71,26 +71,52 @@ dispModelInfo(airspeed(datarange), Va_hat2, names_J, coeff_J, intercept_J);
 %% visualization
 t_compact = 1:length(t(datarange));
 
-figure('Name','Airspeed fit using Airspeed data');
+% airspeed
+figure('Name','Airspeed fit using Airspeed data', 'Position', [200, 400, 600, 400]);
+
 ax = gca;
 set(ax, 'FontSize', 14, 'LineWidth', 1.2);
 set(ax, 'TickLabelInterpreter', 'latex');
+
 hold on;
 scatter(t_compact, airspeed(datarange), 9, 'k', 'filled');
 scatter(t_compact, Va_hat, 3, [230, 97, 1]/255, 'filled');
 scatter(t_compact, Va_hat2, 3, [178,171,210]/255, 'filled');
-
 hold off;
+
 xlabel('Sample index', 'FontSize', 14, 'Interpreter', 'latex');
 ylabel('$V_a$ [m/s]', 'FontSize', 14, 'Interpreter', 'latex');
+
 h = legend('Wind tunnel', ...
            '$\beta_1 \omega + \beta_2 \frac{P^2}{\omega^5}$', ...
            '$\frac{\omega}{2\pi}(\alpha_0 + \alpha_1 C_P + \alpha_2 C_P^4)$');
 set(h, 'Interpreter', 'latex');
-set(h, 'FontSize', 11)
+set(h, 'FontSize', 14);
 legend boxoff;
 box on;
-axis padded
+axis padded;
+
+
+% PRM
+figure('Name','Airspeed fit using Airspeed data', ...
+       'Position', [900, 400, 600, 400]);
+
+ax = gca;
+set(ax, 'FontSize', 14, 'LineWidth', 1.2);
+set(ax, 'TickLabelInterpreter', 'latex');
+
+scatter(t_compact, rpm(datarange), 6, [0, 0, 0], 'filled');
+
+xlabel('Sample index', 'FontSize', 14, 'Interpreter', 'latex');
+ylabel('$\omega$ [RPM]', 'FontSize', 14, 'Interpreter', 'latex');
+
+ax.YAxis.Exponent = 3;
+ax.YRuler.SecondaryLabel.String = '$\times 10^3$';
+ax.YRuler.SecondaryLabel.Interpreter = 'latex';
+ax.YRuler.SecondaryLabel.FontSize = 14;
+
+box on;
+axis padded;
 
 %% save models
 % save('../models/WT.mat', 'names_Va', 'coeff_Va');

@@ -77,13 +77,14 @@ end
 figure('Name','Va(P), omega = const', 'Position', [600, 400, 600, 400]);
 ax = gca;
 set(ax, 'FontSize', 14, 'LineWidth', 1.2, 'TickLabelInterpreter', 'latex');
-hold on;
 
+hold on;
 for i = 1:11:100
     plot(P(:,i), Va, '-', 'Color', 'k', 'LineWidth', 2);
     plot(P(:,i), Va_constRPM_hat(:,i), '--', 'Color', [230, 97, 1]/255, 'LineWidth', 2);
     plot(P(:,i), Va_constRPM_hat2(:,i), '--', 'Color', [178,171,210]/255, 'LineWidth', 2);
 end
+hold off;
 
 xlabel('$P$ [W]', 'Interpreter', 'latex', 'FontSize', 14);
 ylabel('$V_a$ [m/s]', 'Interpreter', 'latex', 'FontSize', 14);
