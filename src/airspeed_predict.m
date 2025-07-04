@@ -33,7 +33,7 @@ alpha_crit = 25*pi/180;
 
 D = 8*0.0254;
 motor_arm = 0.24;
-efficiency = 0.87;
+efficiency = 0.874;
 
 %%
 airspeed = data.airspeed;
@@ -108,54 +108,54 @@ disp("****************** GS metrics ******************");
 dispModelInfo(airspeed(datarange), Va_hat_GS, names_Va, coeff_Va_GS, intercept_Va);
 dispModelInfo(airspeed(datarange), Va_hat2_GS, names_J, coeff_J_GS, intercept_J_GS);
 
-%% plot AoA and J
-figure('Name','Angle of Attack and Advance Ratio');
+%% visualization
+
+% airspeed
+figure('Name', 'Va predict', 'Position', [200, 400, 600, 400]);
 
 ax = gca;
 set(ax, 'FontSize', 14, 'LineWidth', 1.2, 'TickLabelInterpreter', 'latex');
-box on;
-axis padded;
 
-% Left Y-axis
-yyaxis left
-plot(t, rad2deg(alpha), 'Color', [0,0,0]/255, 'LineWidth', 1);
-ylabel('$\alpha$ [deg]', 'FontSize', 14, 'Interpreter', 'latex');
-ax.YColor = [0,0,0]/255;
-% Right Y-axis
-yyaxis right
-hold on
-plot(t, J, 'Color', [230,97,1]/255, 'LineWidth', 1);
-yline(Jcrit, '--', 'Color', [230,97,1]/255, 'LineWidth', 1);
-hold off;
-ylabel('$J$', 'FontSize', 14, 'Interpreter', 'latex');
-ax.YColor = [230,97,1]/255;
-% Shared X-axis
-xlabel('$t$ [s]', 'FontSize', 14, 'Interpreter', 'latex');
-
-h = legend('$\alpha$', '$J$', '$J_\mathrm{crit}=0.21$');
-set(h, 'Interpreter', 'latex');
-set(h, 'FontSize', 11);
-legend boxoff;
-box on;
-axis padded
-
-
-%% visualization
-figure('Name','Va predict');
-ax = gca;
-set(ax, 'FontSize', 14, 'LineWidth', 1.2);
-set(ax, 'TickLabelInterpreter', 'latex');
 hold on;
 plot(t(datarange), airspeed(datarange), '-', 'Color', 'k', 'LineWidth', 2);
 scatter(t(1:20:end), airspeed(1:20:end), 5, 'k', 'filled');
-plot(t(datarange), Va_hat_BEM, '-', 'Color', [178,171,210]/255, 'LineWidth', 0.6); % deep purple , [94,60,153]/255 dark 
-plot(t(datarange), Va_hat_GS, '-', 'Color', [230,97,1]/255, 'LineWidth', 0.6); % orange-like
+plot(t(datarange), Va_hat_BEM, '-', 'Color', [178,171,210]/255, 'LineWidth', 0.6);
+plot(t(datarange), Va_hat_GS, '-', 'Color', [230,97,1]/255, 'LineWidth', 0.6);
 hold off;
+
 xlabel('$t$ [s]', 'FontSize', 14, 'Interpreter', 'latex');
 ylabel('$V_a$ [m/s]', 'FontSize', 14, 'Interpreter', 'latex');
-h = legend('Pitot', 'No estimate', '$V_a(P,\omega)$ - trained on BEM', '$V_a(P,\omega)$ - trained on GPS');
-set(h, 'Interpreter', 'latex');
-set(h, 'FontSize', 11)
+
+h = legend('Pitot', 'No estimate', ...
+           '$V_a(P,\omega)$ - BEM', ...
+           '$V_a(P,\omega)$ - GPS');
+set(h, 'Interpreter', 'latex', 'FontSize', 14);
 legend boxoff;
 box on;
-axis padded
+axis padded;
+
+% AoA and J
+figure('Name', 'Angle of Attack and Advance Ratio', 'Position', [900, 400, 600, 400]);
+
+ax = gca;
+set(ax, 'FontSize', 14, 'LineWidth', 1.2, 'TickLabelInterpreter', 'latex');
+
+yyaxis left
+plot(t, rad2deg(alpha), 'Color', [0, 0, 0]/255, 'LineWidth', 1);
+ylabel('$\alpha$ [deg]', 'FontSize', 14, 'Interpreter', 'latex');
+ax.YColor = [0, 0, 0]/255;
+
+yyaxis right
+hold on
+plot(t, J, 'Color', [230, 97, 1]/255, 'LineWidth', 1);
+hold off;
+ylabel('$J$', 'FontSize', 14, 'Interpreter', 'latex');
+ax.YColor = [230, 97, 1]/255;
+
+xlabel('$t$ [s]', 'FontSize', 14, 'Interpreter', 'latex');
+
+h = legend('$\alpha$', '$J$');
+set(h, 'Interpreter', 'latex', 'FontSize', 14);
+legend boxoff;
+box on;
+axis padded;
