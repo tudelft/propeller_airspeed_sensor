@@ -143,7 +143,7 @@ set(ax, 'FontSize', 14, 'LineWidth', 1.2, 'TickLabelInterpreter', 'latex');
 yyaxis left
 plot(t, rad2deg(alpha), 'Color', [0, 0, 0]/255, 'LineWidth', 1);
 ylabel('$\alpha$ [deg]', 'FontSize', 14, 'Interpreter', 'latex');
-ax.YColor = [0, 0, 0]/255;
+ax.YColor = [0.15 0.15 0.15];
 
 yyaxis right
 hold on
@@ -152,6 +152,7 @@ hold off;
 ylabel('$J$', 'FontSize', 14, 'Interpreter', 'latex');
 ax.YColor = [230, 97, 1]/255;
 
+ax.XColor = [0.15 0.15 0.15];
 xlabel('$t$ [s]', 'FontSize', 14, 'Interpreter', 'latex');
 
 h = legend('$\alpha$', '$J$');
