@@ -28,7 +28,6 @@ load('../models/flight_GS_j.mat')
 coeff_J_GS = coeff_J;
 intercept_J_GS = intercept_J;
 
-Jcrit = 0.20;
 alpha_crit = 25*pi/180;
 
 D = 8*0.0254;

@@ -42,7 +42,7 @@ coeff_Va = B_Va;
 intercept_J = B_J(1);
 coeff_J = B_J(2:3);
 
-%% fitted timeseries
+%% Predict
 Va_hat = X_Va(datarange,:) * coeff_Va + intercept_Va;
 
 J_hat = X_J(datarange,:) * B_J;
