@@ -2,7 +2,7 @@ clear;
 close all;
 
 %% user input
-load('../data/test.mat')
+load('../data/input/test.mat')
 
 load('../models/BEM.mat')
 coeff_Va_BEM = coeff_Va;
