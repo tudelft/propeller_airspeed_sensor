@@ -53,6 +53,17 @@ This software was developed by:
 
 in Technische Universiteit Delft.
 
+## Lisense
+
+The contents in the `data/input` directory are licensed under a **CC-BY 4.0** license (see [CC-BY-4.0](CC-BY-4.0.txt) file). The source code and any other file in this repository are licensed under a GPL-3.0 license (see [LICENSE](LICENSE) file).
+
+Copyright notice:
+
+Technische Universiteit Delft hereby disclaims all copyright interest in the program "Airspeed estimation for UAVs using only propeller feedback" written by the Author(s). 
+Henri Werij, Faculty of Aerospace Engineering, Technische Universiteit Delft.
+
+© 2025, E.Ntouros, P. Kelley, E.Smeur
+
 ## References
 - [CCBlade](https://github.com/WISDEM/CCBlade).
 
