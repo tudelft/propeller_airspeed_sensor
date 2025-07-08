@@ -57,3 +57,4 @@ in Technische Universiteit Delft.
 - [CCBlade](https://github.com/WISDEM/CCBlade).
 
 ## Cite this repository
+How to cite this repository: 10.4121/8bcecbac-5478-4595-b629-4378feac6dcb
