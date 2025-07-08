@@ -135,5 +135,5 @@ set(h, 'FontSize', 11)
 
 %% save models
 % names_Va = {'w', 'p^2*w^-5'};
-% save('../models/flight_GS.mat', 'names_Va', 'coeff_Va');
-% save('../models/flight_GS_j.mat', 'names_J', 'coeff_J', 'intercept_J');
+% save('../models/flight_GPS.mat', 'names_Va', 'coeff_Va');
+% save('../models/flight_GPS_j.mat', 'names_J', 'coeff_J', 'intercept_J');
