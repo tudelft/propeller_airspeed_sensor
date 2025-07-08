@@ -10,8 +10,8 @@ load('../models/WT.mat')
 coeff_Va_WT = coeff_Va;
 load('../models/flight_AS.mat')
 coeff_Va_AS = coeff_Va;
-load('../models/flight_GS.mat')
-coeff_Va_GS = coeff_Va;
+load('../models/flight_GPS.mat')
+coeff_Va_GPS = coeff_Va;
 
 intercept_Va = 0;
 
@@ -24,9 +24,9 @@ intercept_J_WT = intercept_J;
 load('../models/flight_AS_j.mat')
 coeff_J_AS = coeff_J;
 intercept_J_AS = intercept_J;
-load('../models/flight_GS_j.mat')
-coeff_J_GS = coeff_J;
-intercept_J_GS = intercept_J;
+load('../models/flight_GPS_j.mat')
+coeff_J_GPS = coeff_J;
+intercept_J_GPS = intercept_J;
 
 alpha_crit = 25*pi/180;
 
@@ -83,7 +83,7 @@ datarange = datarange & alpha<alpha_crit;
 Va_hat_BEM = X_Va(datarange,:) * coeff_Va_BEM + intercept_Va;
 Va_hat_WT = X_Va(datarange,:) * coeff_Va_WT + intercept_Va;
 Va_hat_AS = X_Va(datarange,:) * coeff_Va_AS + intercept_Va;
-Va_hat_GS = X_Va(datarange,:) * coeff_Va_GS + intercept_Va;
+Va_hat_GPS = X_Va(datarange,:) * coeff_Va_GPS + intercept_Va;
 
 J_hat_BEM = X_J(datarange,:) * coeff_J_BEM + intercept_J_BEM;
 Va_hat2_BEM = J_hat_BEM .* (rpm(datarange)/60) * D;
@@ -91,8 +91,8 @@ J_hat_WT = X_J(datarange,:) * coeff_J_WT + intercept_J_WT;
 Va_hat2_WT = J_hat_WT .* (rpm(datarange)/60) * D;
 J_hat_AS = X_J(datarange,:) * coeff_J_AS + intercept_J_AS;
 Va_hat2_AS = J_hat_AS .* (rpm(datarange)/60) * D;
-J_hat_GS = X_J(datarange,:) * coeff_J_GS + intercept_J_GS;
-Va_hat2_GS = J_hat_GS .* (rpm(datarange)/60) * D;
+J_hat_GPS = X_J(datarange,:) * coeff_J_GPS + intercept_J_GPS;
+Va_hat2_GPS = J_hat_GPS .* (rpm(datarange)/60) * D;
 
 disp("****************** BEM metrics ******************");
 dispModelInfo(airspeed(datarange), Va_hat_BEM, names_Va, coeff_Va_BEM, intercept_Va);
@@ -103,9 +103,9 @@ dispModelInfo(airspeed(datarange), Va_hat2_WT, names_J, coeff_J_WT, intercept_J_
 disp("****************** AS metrics ******************");
 dispModelInfo(airspeed(datarange), Va_hat_AS, names_Va, coeff_Va_AS, intercept_Va);
 dispModelInfo(airspeed(datarange), Va_hat2_AS, names_J, coeff_J_AS, intercept_J_AS);
-disp("****************** GS metrics ******************");
-dispModelInfo(airspeed(datarange), Va_hat_GS, names_Va, coeff_Va_GS, intercept_Va);
-dispModelInfo(airspeed(datarange), Va_hat2_GS, names_J, coeff_J_GS, intercept_J_GS);
+disp("****************** GPS metrics ******************");
+dispModelInfo(airspeed(datarange), Va_hat_GPS, names_Va, coeff_Va_GPS, intercept_Va);
+dispModelInfo(airspeed(datarange), Va_hat2_GPS, names_J, coeff_J_GPS, intercept_J_GPS);
 
 %% visualization
 
@@ -119,7 +119,7 @@ hold on;
 plot(t(datarange), airspeed(datarange), '-', 'Color', 'k', 'LineWidth', 2);
 scatter(t(1:20:end), airspeed(1:20:end), 5, 'k', 'filled');
 plot(t(datarange), Va_hat_BEM, '-', 'Color', [178,171,210]/255, 'LineWidth', 0.6);
-plot(t(datarange), Va_hat_GS, '-', 'Color', [230,97,1]/255, 'LineWidth', 0.6);
+plot(t(datarange), Va_hat_GPS, '-', 'Color', [230,97,1]/255, 'LineWidth', 0.6);
 hold off;
 
 xlabel('$t$ [s]', 'FontSize', 14, 'Interpreter', 'latex');
