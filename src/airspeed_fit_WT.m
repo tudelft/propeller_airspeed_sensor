@@ -2,7 +2,7 @@ clear;
 close all;
 
 %% user input
-load('../data/wt.mat')
+load('../data/input/wt.mat')
 Jcrit = 0.20;
 
 D = 8*0.0254;

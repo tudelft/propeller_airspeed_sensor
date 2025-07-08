@@ -2,7 +2,7 @@ clear;
 close all;
 
 %% user input
-load('../data/training.mat')
+load('../data/input/training.mat')
 Jcrit = 0.20; 
 
 D = 8*0.0254;
