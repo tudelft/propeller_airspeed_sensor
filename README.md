@@ -24,7 +24,7 @@ This code has been developed and tested in Matlab R2024a.
 ```
 
 - `BEM/` contains the simulation script and the propeller aerodynamic parameters file.
-- `data/` contains the BEM, wind tunnel, and flight datasets (training and test) and subdirectories `data/eff` and `data/Jcrit` store intermediate output files used by the code.
+- `data/input/` contains the BEM, wind tunnel, and flight datasets (training and test). `data/eff/` and `data/Jcrit/` store intermediate output files used by the code.
 - `eps/`, `figs/`, and `photos/` contain figures used in the paper.
 - `models/` stores the identified intermediate model coefficients.
 - `src/` contains the core scripts and helper functions.
@@ -33,7 +33,7 @@ This code has been developed and tested in Matlab R2024a.
 ## Usage
 
 ### BEM
-File `data/BEM.mat` already contains the BEM simulation data for the experimental setup described in our paper. To use different propeller rerun the BEM tool following the instructions from the original repository.
+File `data/input/BEM.mat` already contains the BEM simulation data for the experimental setup described in our paper. To use different propeller rerun the BEM tool following the instructions from the original repository.
 
 ### src
 - `airspeed_fit_BEM.m` fits the model to the BEM data.
@@ -55,7 +55,7 @@ in Technische Universiteit Delft.
 
 ## Lisense
 
-The contents in the `data/input` directory are licensed under a **CC-BY 4.0** license (see [CC-BY-4.0](CC-BY-4.0.txt) file). The source code and any other file in this repository are licensed under a GPL-3.0 license (see [LICENSE](LICENSE) file).
+The contents in the `data/input/` directory are licensed under a **CC-BY 4.0** license (see [CC-BY-4.0](CC-BY-4.0.txt) file). The source code and any other file in this repository are licensed under a GPL-3.0 license (see [LICENSE](LICENSE) file).
 
 Copyright notice:
 
