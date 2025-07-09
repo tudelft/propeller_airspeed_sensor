@@ -68,4 +68,5 @@ Henri Werij, Faculty of Aerospace Engineering, Technische Universiteit Delft.
 - [CCBlade](https://github.com/WISDEM/CCBlade).
 
 ## Cite this repository
-How to cite this repository: 10.4121/8bcecbac-5478-4595-b629-4378feac6dcb
+**How to cite this repository:** E. Ntouros, P. Kelley, E. Smeur, 2025, Dataset for UAV airspeed estimation using propeller feedback. 4TU.ResearchData. Software.
+10.4121/8bcecbac-5478-4595-b629-4378feac6dcb
