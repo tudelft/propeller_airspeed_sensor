@@ -1,3 +1,5 @@
+ [![CODECHECK](https://codecheck.org.uk/img/codeworks-badge.svg)](https://doi.org/10.5281/zenodo.16616998)
+
 # Airspeed estimation for UAVs using only propeller feedback
 
 This repository contains MATLAB scripts to derive and validate an airspeed model for fixed-wing Unmanned Aerial Vehicles (UAVs) using solely propeller power and rotational speed data.  
