@@ -275,7 +275,7 @@ Henri Werij, Faculty of Aerospace Engineering, Technische Universiteit Delft.
 ## References  
 
 - [CCBlade](https://github.com/WISDEM/CCBlade)  
-- Preprint: [Airspeed estimation for UAVs using only propeller feedback](https://arxiv.org/abs/2507.03456)  
+- [Airspeed estimation for UAVs using only propeller feedback](https://doi.org/10.1016/j.ast.2025.110999)  
 
 
 ## Cite this repository
