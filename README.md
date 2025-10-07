@@ -8,7 +8,7 @@ The model can be used to replace Pitot-tube-based airspeed sensors, or contribut
 model and is computationally lightweight. It leverages power and rotational speed feedback, which is readily available from modern Electronic Speed Controllers (ESCs), 
 thereby enabling seamless integration with existing systems and off-the-shelf components.  
 
-See more about the model and its mathematical formulation in the related article (final version in prep.; see pre-print [here](https://arxiv.org/abs/2507.03456)).  
+See more about the model and its mathematical formulation in the related article [Airspeed estimation for UAVs using only propeller feedback](https://doi.org/10.1016/j.ast.2025.110999).  
 
 
 ## Requirements
