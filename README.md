@@ -19,7 +19,7 @@ This code has been developed and tested in Matlab R2024a.
 ## Installation
 
 - No additional installation is needed for the MATLAB core.  
-- (Optional) To run the Blade Element Momentum (BEM) simulations follow installation process of the BEM tool [CCBlade](https://github.com/WISDEM/CCBlade).  
+- (Optional) To run the Blade Element Momentum (BEM) simulations follow installation process of the BEM tool [CCBlade](https://github.com/byuflowlab/CCBlade.jl).  
 
 
 ## Structure
@@ -118,7 +118,7 @@ The **core scripts** found in `./src/`, when run with the default values they ge
 
 The **core scripts** can also generate the `.mat` models found in `./models/` (instructions to generate them are in commented text).  
 
-The **core scripts** can also be used independently to fit the model to other datasets following our methodology. The model we derived used the BEM simulation data for the experimental setup described in our article. To use a different propeller re-run the BEM tool [CCBlade](https://github.com/WISDEM/CCBlade) following the instructions from their repository.   
+The **core scripts** can also be used independently to fit the model to other datasets following our methodology. The model we derived used the BEM simulation data for the experimental setup described in our article. To use a different propeller re-run the BEM tool [CCBlade](https://github.com/byuflowlab/CCBlade.jl) following the instructions from their repository.   
 
 ###  Instructions
 
@@ -274,7 +274,7 @@ Henri Werij, Faculty of Aerospace Engineering, Technische Universiteit Delft.
 
 ## References  
 
-- [CCBlade](https://github.com/WISDEM/CCBlade)  
+- [CCBlade](https://github.com/byuflowlab/CCBlade.jl)  
 - [Airspeed estimation for UAVs using only propeller feedback](https://doi.org/10.1016/j.ast.2025.110999)  
 
 
